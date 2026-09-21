@@ -8,7 +8,7 @@ Reparto Práctica 1
     - Ejercicio 2: Fecha limite: 20/09 (sugerencia: 1 x persona de los restantes)
         - validar_grafo -> Oier Osorio
         - grado_entrada -> Israel Suarez
-        - distancia -> 
+        - distancia -> Adrián Muñoz 
     - Ejercicio 3:
         - pasarle pylin al fichero ->
 
