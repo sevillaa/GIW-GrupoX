@@ -172,7 +172,7 @@ def distancia(grafo, nodo):
 
     for nodo_actual in grafo["nodos"]:
         #indica por defecto que el nodo aún no ha sido visitado o no es alcanzable
-        dist[nodo_actual] = -1  
+        dist[nodo_actual] = -1
 
     dist[nodo] = 0 #la distancia de un nodo a sí mismo es 0
     cola = [nodo]
@@ -184,7 +184,6 @@ def distancia(grafo, nodo):
                 dist[vecino] = dist[actual] + 1
                 cola.append(vecino)
     return dist
-   
 
 
 if __name__ == "__main__":
@@ -194,19 +193,19 @@ if __name__ == "__main__":
     matriz_mal_formada = [[1, 2], [3, 4, 5]]
     matriz_no_simetrica = [[1, 1, 3], [2,2,3], [3,3,3]]
     matriz_simetrica = [[1, 2, 3], [2,5,2], [3,2,3]]
-    
+
     # Funciones implementadas
-    print(f"Dimensión matriz_normal: {dimension(matriz_normal)}")            
-    print(f"Dimensión matriz_mal_formada: {dimension(matriz_mal_formada)}")  
-    print(f"Es cuadrada matriz_cuadrada: {es_cuadrada(matriz_cuadrada)}")    
-    print(f"Es cuadrada matriz_normal: {es_cuadrada(matriz_normal)}")        
+    print(f"Dimensión matriz_normal: {dimension(matriz_normal)}")
+    print(f"Dimensión matriz_mal_formada: {dimension(matriz_mal_formada)}")
+    print(f"Es cuadrada matriz_cuadrada: {es_cuadrada(matriz_cuadrada)}")
+    print(f"Es cuadrada matriz_normal: {es_cuadrada(matriz_normal)}")
 
-    print(f"Es simetrica matriz_simetrica: {es_simetrica(matriz_simetrica)}") 
-    print(f"Es simetrica matriz_no_simetrica: {es_simetrica(matriz_no_simetrica)}") 
-    print(f"Es simetrica matriz_normal: {es_simetrica(matriz_normal)}") 
+    print(f"Es simetrica matriz_simetrica: {es_simetrica(matriz_simetrica)}")
+    print(f"Es simetrica matriz_no_simetrica: {es_simetrica(matriz_no_simetrica)}")
+    print(f"Es simetrica matriz_normal: {es_simetrica(matriz_normal)}")
 
-    print(f"Suma matriz_normal + matriz_normal: {suma(matriz_normal,matriz_normal)}") 
-    print(f"Multiplicación 2* matriz_normal: {multiplica_escalar(matriz_normal,2)}") 
+    print(f"Suma matriz_normal + matriz_normal: {suma(matriz_normal,matriz_normal)}")
+    print(f"Multiplicación 2* matriz_normal: {multiplica_escalar(matriz_normal,2)}")
 
     print(f"Es simétrica: {es_simetrica(matriz_simetrica)}")
     print(f"Multiplica escalar x2: {multiplica_escalar(matriz_normal, 2)}")
