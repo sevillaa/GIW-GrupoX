@@ -16,6 +16,7 @@ resultados de los demás.
 
 # https://docs.python.org/3/library/csv.html
 import csv;
+import json;
 from pprint import pprint
 
 ### Formato CSV
@@ -66,7 +67,13 @@ def puntos_negros_distrito(datos, distrito, k):
 
 #### Formato JSON
 def leer_monumentos(ruta):
-    ...
+    
+    with open('300356-2-monumentos-ciudad-madrid-json.json', 'r', encoding='utf-8') as archivo:
+        datos = json.load(archivo)
+    print(datos)
+
+    
+    
 
 def codigos_postales(monumentos):
     ...
