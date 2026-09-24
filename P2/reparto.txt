@@ -1,0 +1,22 @@
+Reparto Práctica 1
+    - Ejercicio 1:
+        - dimension -> Miguel Sevilla
+        - es_cuadrada -> Miguel Sevilla
+        - es_simetrica -> Izan de Vega
+        - multiplica_escalar -> Izan de Vega
+        - suma -> Miguel Sevilla
+    - Ejercicio 2: Fecha limite: 20/09 (sugerencia: 1 x persona de los restantes)
+        - validar_grafo -> Oier Osorio
+        - grado_entrada -> Israel Suarez
+        - distancia -> Adrian Muñoz
+    - Ejercicio 3:
+        - pasarle pylin al fichero ->
+            - Ej 1:
+                - es_simetrica -> Izan de Vega
+                - multiplica_escalar -> Izan de Vega
+            - Ej 2:
+                - validar -> Oier Osorio
+                - grado_entrada -> Israel Suarez
+                - distancia -> Adrian Muñoz
+
+Plazo entrega -> 24 Septiembre
