@@ -1,5 +1,5 @@
 Reparto Práctica 2
-    - Ejercicio 1: Izan
+    - Ejercicio 1: Izan de Vega
         - def lee_fichero_accidentes:
         - def accidentes_por_distrito_tipo:
         - def dias_mas_accidentes:
