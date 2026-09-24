@@ -14,6 +14,7 @@ deshonesta ninguna otra actividad que pueda mejorar nuestros resultados ni perju
 resultados de los demás.
 """
 
+# https://docs.python.org/3/library/csv.html
 import csv;
 from pprint import pprint
 
@@ -29,7 +30,18 @@ def lee_fichero_accidentes(ruta):
         return whole_list
 
 def accidentes_por_distrito_tipo(datos):
-    ...
+    '''given a list of dictionary returns the number of accidents of each type on each district
+    This uses keys: "distrito" and "tipo_accidente" and returns a dictionary whose keys are
+    ("distrito","tipo_accidente") and value is the number of "tipo_accidente" in "distrito" in "datos"
+    '''
+    ret_val = {};
+    for val in datos:
+        if not (val["distrito"],val["tipo_accidente"]) in ret_val:
+            ret_val[(val["distrito"],val["tipo_accidente"])] = 1
+        else: 
+            ret_val[(val["distrito"], val["tipo_accidente"])] += 1
+    return ret_val
+
 
 def dias_mas_accidentes(datos):
     ...
@@ -52,4 +64,5 @@ def busqueda_distancia(monumentos, direccion, distancia):
     ...
 
 if __name__ == "__main__":
-    pprint(lee_fichero_accidentes("AccidentesBicicletas_2025.csv"))
+    data = lee_fichero_accidentes("AccidentesBicicletas_2025.csv")
+    pprint(accidentes_por_distrito_tipo(data))
