@@ -14,10 +14,19 @@ deshonesta ninguna otra actividad que pueda mejorar nuestros resultados ni perju
 resultados de los demás.
 """
 
+import csv;
+from pprint import pprint
 
 ### Formato CSV
 def lee_fichero_accidentes(ruta):
-    ...
+    '''Lee un fichero csv con delimitador ';' y en el que la cabecera marca las claves de un diccionario
+    y los valores vienen dados por los valores en la misma posición de las siguientes filas.
+    De forma que devuelve un array de diccionarios a partir del fichero en 'ruta' 
+    '''
+    with open(ruta, "r", newline='', encoding='utf8') as fich:
+        lector = csv.DictReader(fich, delimiter=';')
+        whole_list = list(lector)
+        return whole_list
 
 def accidentes_por_distrito_tipo(datos):
     ...
@@ -41,3 +50,6 @@ def busqueda_palabras_clave(monumentos, palabras):
 
 def busqueda_distancia(monumentos, direccion, distancia):
     ...
+
+if __name__ == "__main__":
+    pprint(lee_fichero_accidentes("AccidentesBicicletas_2025.csv"))
