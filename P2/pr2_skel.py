@@ -35,7 +35,7 @@ def accidentes_por_distrito_tipo(datos):
     This uses keys: "distrito" and "tipo_accidente" and returns a dictionary whose keys are
     ("distrito","tipo_accidente") and value is the number of "tipo_accidente" in "distrito" in "datos"
     '''
-    ret_val = {};
+    ret_val = {}
     for val in datos:
         if not (val["distrito"],val["tipo_accidente"]) in ret_val:
             ret_val[(val["distrito"],val["tipo_accidente"])] = 1
@@ -45,7 +45,21 @@ def accidentes_por_distrito_tipo(datos):
 
 
 def dias_mas_accidentes(datos):
-    ...
+    '''Returns a dictionary with pair of key values in which 
+    the keys are a date and 
+    the values are the number of accidents in the given date
+    This dictionary has the day of days with the highest ammount of accidents'''
+    ret_val = {}
+    greatest_value = 0
+    for val in datos:
+        if not val["fecha"] in ret_val:
+            ret_val[val["fecha"]] = 1
+            greatest_value = max(greatest_value, 1)
+        else: 
+            ret_val[val["fecha"]] += 1
+            greatest_value = max(ret_val[val["fecha"]], greatest_value)
+
+    return {key:value for key,value in ret_val.items() if value == greatest_value}
 
 def puntos_negros_distrito(datos, distrito, k):
     ...
@@ -71,7 +85,13 @@ def busqueda_distancia(monumentos, direccion, distancia):
     ...
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     #data = lee_fichero_accidentes("AccidentesBicicletas_2025.csv")
     #pprint(accidentes_por_distrito_tipo(data))
     
     leer_monumentos("300356-2-monumentos-ciudad-madrid-json.json")
+=======
+    data = lee_fichero_accidentes("AccidentesBicicletas_2025.csv")
+    # pprint(accidentes_por_distrito_tipo(data))
+    pprint(dias_mas_accidentes(data))
+>>>>>>> e2dc3d9d65c842aa55636089f04aa0bba31a5e1e
