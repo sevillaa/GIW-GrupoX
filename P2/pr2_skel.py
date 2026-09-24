@@ -54,7 +54,7 @@ def puntos_negros_distrito(datos, distrito, k):
 #### Formato JSON
 def leer_monumentos(ruta):
     
-    with open('300356-2-monumentos-ciudad-madrid-json.json', 'r', encoding='utf-8') as archivo:
+    with open(ruta, 'r', encoding='utf-8') as archivo:
         datos = json.load(archivo)
     print(datos)
 
@@ -71,5 +71,7 @@ def busqueda_distancia(monumentos, direccion, distancia):
     ...
 
 if __name__ == "__main__":
-    data = lee_fichero_accidentes("AccidentesBicicletas_2025.csv")
-    pprint(accidentes_por_distrito_tipo(data))
+    #data = lee_fichero_accidentes("AccidentesBicicletas_2025.csv")
+    #pprint(accidentes_por_distrito_tipo(data))
+    
+    leer_monumentos("300356-2-monumentos-ciudad-madrid-json.json")
