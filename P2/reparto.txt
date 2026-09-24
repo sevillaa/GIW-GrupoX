@@ -1,10 +1,10 @@
-Reparto Práctica 1
-    - Ejercicio 1:
+Reparto Práctica 2
+    - Ejercicio 1: Izan
         - def lee_fichero_accidentes:
         - def accidentes_por_distrito_tipo:
         - def dias_mas_accidentes:
         - def puntos_negros_distrito:
-    - Ejercicio 2:
+    - Ejercicio 2: Miguel
         - def leer_monumentos:
         - def codigos_postales
         - def busqueda_palabras_clave:

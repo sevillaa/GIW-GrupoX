@@ -15,9 +15,11 @@ resultados de los demás.
 
 # Ejercicio 1
 
-#devuelve una tuple (filas, columnas) con el tamaño de la matriz. Si la matriz esta mal formada
-#debera devolver none
 def dimension(matriz):
+    """
+    Calcula la dimension de una matriz, comprobando primero si la longitud es mayor a 0 y 
+    posteriormente comprueba que cada fila tenga las mismas columnas
+    """
     if len(matriz) == 0 or matriz is None:
         return None
     filas = len(matriz)
@@ -30,6 +32,9 @@ def dimension(matriz):
     return (filas, columnas)
 
 def es_cuadrada(matriz):
+    """
+    Comprueba su la matriz es cuadrada si el numero de filas = columnas
+    """
     tamanio = dimension(matriz)
 
     if tamanio is None:
@@ -81,27 +86,28 @@ def multiplica_escalar(matriz, k):
 
 
 def suma(matriz1, matriz2):
+    """
+    Comprueba que las matrices estén bien formadas y tengan la misma
+    dimensión, y suma sus elementos en una nueva matriz.
+    """
     d1 = dimension(matriz1)
     d2 = dimension(matriz2)
 
-    # Comprobar que las matrices están bien formadas
-    # y tienen la misma dimensión
     if d1 is None or d2 is None or d1 != d2:
         return None
 
     matriz3 = []
 
-    for i in range(len(matriz1)):
+    for i, filai in enumerate(matriz1):
         fila = []
 
-        for j in range(len(matriz1[i])):
-            resultado = matriz1[i][j] + matriz2[i][j]
+        for j, valor in enumerate(filai):
+            resultado = valor + matriz2[i][j]
             fila.append(resultado)
 
         matriz3.append(fila)
 
     return matriz3
-
 
 
 # Ejercicio 2
@@ -229,15 +235,15 @@ if __name__ == "__main__":
     print("distancia(g, 'Z'):", distancia(g, "Z"))
     # 5. prueba validar
     print(f"Es valida: {validar(g)}")
-    print(f"Es valida: {validar({"nodos" : [1,2], "aristas":{1:[2], 2:[2]}})}")
-    print(f"Es valida: {validar({"nodos" : [1,2], "aristas":{1:[2]}})}")
-    print(f"Es valida: {validar({"nodos" : [], "aristas":{}})}")
-    print(f"Es valida: {validar({"nodos" : [1,2], "aristas":{1:[2], 2: [2,2]}})}")
-    print(f"Es valida: {validar({"nodos" : [1,2], "aristas":{1:[], 2: []}})}")
+    #print(f"Es valida: {validar({"nodos" : [1,2], "aristas":{1:[2], 2:[2]}})}")
+    #print(f"Es valida: {validar({"nodos" : [1,2], "aristas":{1:[2]}})}")
+    #print(f"Es valida: {validar({"nodos" : [], "aristas":{}})}")
+    #print(f"Es valida: {validar({"nodos" : [1,2], "aristas":{1:[2], 2: [2,2]}})}")
+    #print(f"Es valida: {validar({"nodos" : [1,2], "aristas":{1:[], 2: []}})}")
 
     # 6. Prueba del grado de entrada
-    print("Grado entrada(g, 'a'):", grado_entrada(g, "a"))
-    print("Grado entrada(g, 'd'):", grado_entrada(g, "d"))
-    print("Grado entrada(g, 'Z'):", grado_entrada(g, "Z"))
-    print("Grado entrada({'nodos': [1,2], 'aristas': {1: [2]}}, '2'):",
-          grado_entrada({"nodos": [1, 2], "aristas": {1: [2]}}, "2"))
+    #print("Grado entrada(g, 'a'):", grado_entrada(g, "a"))
+    #print("Grado entrada(g, 'd'):", grado_entrada(g, "d"))
+    #print("Grado entrada(g, 'Z'):", grado_entrada(g, "Z"))
+    #print("Grado entrada({'nodos': [1,2], 'aristas': {1: [2]}}, '2'):",
+     #     grado_entrada({"nodos": [1, 2], "aristas": {1: [2]}}, "2"))

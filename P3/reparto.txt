@@ -1,5 +1,8 @@
-Reparto Practica 3:
-->Nombres de restaurantes :
--> Subcategorías de cocina :
-->Información de un restaurante :
--> Restaurantes por cercanía:
+Reparto Práctica 3
+    - Ejercicio 1: Nombres de restaurantes
+    - Ejercicio 2: Subcategorías de cocina
+    - Ejercicio 3: Información de un restaurante
+    - Ejercicio 4:Restaurantes por cercanía
+    
+Entrega lista -> 11/09/26
+Plazo entrega final -> 18/10/26
