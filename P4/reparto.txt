@@ -1,0 +1,10 @@
+Reparto Práctica 4
+- crear DB
+- cargar DB
+- consulta 1
+- consulta 2
+- consulta 3
+- consulta 4
+    
+Entrega lista -> 11/09/26
+Plazo entrega final -> 18/10/26
