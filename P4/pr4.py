@@ -15,13 +15,22 @@ deshonesta ninguna otra actividad que pueda mejorar nuestros resultados ni perju
 resultados de los demás.
 """
 
+import sqlite3 as sq
 
 def crear_bd(db_filename):
-    ...
+    conn = sq.connect(db_filename)
+    conn.execute("PRAGMA foreign_keys = ON")
+    
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE datos_generales (ticker TEXT PRIMARY KEY, nombre TEXT, indice TEXT, pais TEXT)")
+    cur.execute("CREATE TABLE semanales_IBEX35 (ticker TEXT, fecha TEXT, precio REAL, PRIMARy KEY(ticker,fecha),FOREIGN KEY(ticker) REFERENCES datos_generales(ticker))")
+    cur.close()
 
 
 def cargar_bd(db_filename, tab_datos, tab_ibex35):
-    ...
+    conn = sq.connect(db_filename)
+    cur = conn.cursor()
+
 
 
 def consulta1(db_filename, indice):
@@ -38,3 +47,7 @@ def consulta3(db_filename, limite):
 
 def consulta4(db_filename, ticker):
     ...
+
+
+if __name__ == "__main__":
+    crear_bd("fichero.db")
