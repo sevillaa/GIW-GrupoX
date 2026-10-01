@@ -29,18 +29,16 @@ def lee_fichero_accidentes(ruta):
     De forma que devuelve un array de diccionarios a partir del fichero en 'ruta' 
     '''
     with open(ruta, "r", newline='', encoding='utf8') as fich:
-        # DictReader reads the csv as a dictionary.
-        # Keys are first row, values of each key are in the rest of rows in the same idx as the key
+        # DictReader lee el csv como un diccionario.
+        # Las claves están en la primera fila, los valores para cada clave están
+        # en el mismo indice de columna que la clave correspondiente
         lector = csv.DictReader(fich, delimiter=';')
         whole_list = list(lector)
         return whole_list
 
 def accidentes_por_distrito_tipo(datos):
-    '''given a list of dictionary returns the number of accidents of each type on each district
-    This uses keys: "distrito" and "tipo_accidente" and returns a dictionary whose keys are
-    ("distrito","tipo_accidente") and value is the number of "tipo_accidente" 
-    in "distrito" in "datos"
-    '''
+    '''Dada una lista de diccionarios "datos" devuelve el número de accidentes 
+    de cada tipo en cada distrito'''
     ret_val = {}
     for val in datos:
         if (val["distrito"],val["tipo_accidente"]) not in ret_val:
@@ -79,10 +77,12 @@ def puntos_negros_distrito(datos, distrito, k):
                 ret_val[val["localizacion"]] = 1
             else:
                 ret_val[val["localizacion"]] += 1
-    # items() returns a pair(key,value) dictionary view
-    # its connected (shares elements) to the dictionary, that's why we gotta use 'list()'
+    # items() devuelve un par(clave,valor) dictionary view
+    # está conectada (comparte los elementos) con el diccionario,
+    # por eso tenemos que usar 'list()'
     array_ret_val = list(ret_val.items())
-    # orders by descendant value and alphabetically in case of draw
+    # ordenada de mayor a menor valor primero por el número de accidentes en esa zona
+    # y después por orden alfabético de mayor a menor también.
     def ordering_func(word):
         return (word[1],word[0])
     array_ret_val.sort(key=ordering_func, reverse=True)
@@ -209,16 +209,16 @@ if __name__ == "__main__":
     pprint(puntos_negros_distrito(data, "MONCLOA-ARAVACA", 16))
 
     print("\nEjercicio 2:")
-    monumentos = leer_monumentos("300356-2-monumentos-ciudad-madrid-json.json")
-    print("Monumentos leídos:", len(monumentos))
+    monumentos_main = leer_monumentos("300356-2-monumentos-ciudad-madrid-json.json")
+    print("Monumentos leídos:", len(monumentos_main))
 
     print("Primeros cinco códigos postales:")
-    pprint(codigos_postales(monumentos)[:5])
+    pprint(codigos_postales(monumentos_main)[:5])
 
     print("Búsqueda de palabras clave:")
-    pprint(busqueda_palabras_clave(monumentos, ["Alfonso", "XII"]))
+    pprint(busqueda_palabras_clave(monumentos_main, ["Alfonso", "XII"]))
 
     print("Monumentos a menos de 1 km de la facultad:")
     pprint(busqueda_distancia(
-        monumentos, "Profesor José García Santesmases 9, Madrid, España", 1
+        monumentos_main, "Profesor José García Santesmases 9, Madrid, España", 1
     ))
