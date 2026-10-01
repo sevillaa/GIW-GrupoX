@@ -76,14 +76,16 @@ def puntos_negros_distrito(datos, distrito, k):
     for val in datos:
         if val["distrito"] == distrito:
             if val["localizacion"] not in ret_val:
-                ret_val[val["localizacion"]] = 0
+                ret_val[val["localizacion"]] = 1
             else:
                 ret_val[val["localizacion"]] += 1
     # items() returns a pair(key,value) dictionary view
     # its connected (shares elements) to the dictionary, that's why we gotta use 'list()'
     array_ret_val = list(ret_val.items())
     # orders by descendant value and alphabetically in case of draw
-    array_ret_val.sort(key=lambda x: (-x[1], x[0]))
+    def ordering_func(word):
+        return (word[1],word[0])
+    array_ret_val.sort(key=ordering_func, reverse=True)
     return [array_ret_val[i] for i in range(0,k)]
 
 #### Formato JSON
@@ -203,8 +205,8 @@ if __name__ == "__main__":
     pprint(accidentes_por_distrito_tipo(data))
     pprint("Dias con más accidentes: ")
     pprint(dias_mas_accidentes(data))
-    pprint("Top 5 puntos negros Centro")
-    pprint(puntos_negros_distrito(data, "CENTRO", 5))
+    pprint("Top 16 puntos negros Moncloa-Aravaca")
+    pprint(puntos_negros_distrito(data, "MONCLOA-ARAVACA", 16))
 
     print("\nEjercicio 2:")
     monumentos = leer_monumentos("300356-2-monumentos-ciudad-madrid-json.json")
