@@ -18,13 +18,33 @@ resultados de los demás.
 import sqlite3 as sq
 
 def crear_bd(db_filename):
+    """
+    Crea la base de datos con las tablas datos_generales y semanales_IBEX35.
+    Configura las claves primarias y la clave foránea entre ambas tablas.
+    Cierra el cursor y la conexión al terminar.
+    """
     conn = sq.connect(db_filename)
-    conn.execute("PRAGMA foreign_keys = ON")
-    
+    conn.execute("PRAGMA foreign_keys = ON") 
     cur = conn.cursor()
-    cur.execute("CREATE TABLE datos_generales (ticker TEXT PRIMARY KEY, nombre TEXT, indice TEXT, pais TEXT)")
-    cur.execute("CREATE TABLE semanales_IBEX35 (ticker TEXT, fecha TEXT, precio REAL, PRIMARy KEY(ticker,fecha),FOREIGN KEY(ticker) REFERENCES datos_generales(ticker))")
+    cur.execute("""
+        CREATE TABLE datos_generales (
+            ticker TEXT PRIMARY KEY,
+            nombre TEXT,
+            indice TEXT,
+            pais TEXT
+        )
+    """)
+    cur.execute("""
+        CREATE TABLE semanales_IBEX35 (
+            ticker TEXT,
+            fecha TEXT,
+            precio REAL,
+            PRIMARY KEY (ticker, fecha),
+            FOREIGN KEY (ticker) REFERENCES datos_generales(ticker)
+        )
+    """)
     cur.close()
+    conn.close()
 
 
 def cargar_bd(db_filename, tab_datos, tab_ibex35):
