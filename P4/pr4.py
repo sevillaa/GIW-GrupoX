@@ -15,7 +15,9 @@ deshonesta ninguna otra actividad que pueda mejorar nuestros resultados ni perju
 resultados de los demás.
 """
 
+import csv
 import sqlite3 as sq
+from datetime import datetime
 
 def crear_bd(db_filename):
     """
@@ -48,8 +50,43 @@ def crear_bd(db_filename):
 
 
 def cargar_bd(db_filename, tab_datos, tab_ibex35):
+    """
+    Carga los datos de los dos ficheros CSV en la base de datos.
+    Convierte las fechas al formato YYYY-MM-DD HH:MM.
+    """
     conn = sq.connect(db_filename)
     cur = conn.cursor()
+
+    try:
+        conn.execute("PRAGMA foreign_keys = ON")
+
+        with open(tab_datos, encoding="utf-8", newline="") as archivo:
+            lector = csv.DictReader(archivo, delimiter=";")
+
+            for fila in lector:
+                cur.execute("""
+                    INSERT INTO datos_generales (ticker, nombre, indice, pais)
+                    VALUES (?, ?, ?, ?)
+                """, (fila["ticker"], fila["nombre"], fila["indice"], fila["pais"]))
+
+        with open(tab_ibex35, encoding="utf-8", newline="") as archivo:
+            lector = csv.DictReader(archivo, delimiter=";")
+
+            for fila in lector:
+                fecha = datetime.strptime(fila["fecha"], "%d/%m/%Y %H:%M")
+                fecha = fecha.strftime("%Y-%m-%d %H:%M")
+                precio = float(fila["precio"])
+
+                cur.execute("""
+                    INSERT INTO semanales_IBEX35 (ticker, fecha, precio)
+                    VALUES (?, ?, ?)
+                """, (fila["ticker"], fecha, precio))
+
+        conn.commit()
+
+    finally:
+        cur.close()
+        conn.close() 
 
 
 
