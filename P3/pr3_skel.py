@@ -40,10 +40,63 @@ class _HandlerRestaurante(xml.sax.ContentHandler):
             self.current_text.append(content)
 
     
+#Ejercicio 2
+class _HandlerCategorias(xml.sax.ContentHandler):
+
+    def __init__(self):
+        super().__init__()
+        self.in_Categoria = False
+        self.in_SubCategoria = False
+        self.categoria_nombre = []
+        self.subcategoria_nombre = []
+        self.categoria_actual = ""#Guarda el nombre de la categoria para recordarla entre subcategorias
+        self.in_item = False
+
+    def startElement(self, name, attrs):
+
+        if name.lower() == "categoria":
+            self.in_Categoria = True
+        elif name.lower() == "subcategoria":
+            self.in_SubCategoria = True
+        elif name.lower() == "item":
+            label = attrs.get("name")
+            if label.lower() == "categoria":
+                self.in_item = True
+                self.categoria_nombre = []
+            elif label.lower() == "subcategoria":
+                self.in_item = True
+                self.subcategoria_nombre = []
+
+
+    def characters(self, content):
+        if self.in_Categoria and not self.in_SubCategoria and self.in_item:
+            self.categoria_nombre.append(content) 
+        elif self.in_SubCategoria and self.in_Categoria and self.in_item:
+            self.subcategoria_nombre.append(content)
+
+    def endElement(self, name):
+
+        if name.lower() == "item":
+            if self.in_Categoria and not self.in_SubCategoria:
+                self.categoria_actual = "".join(self.categoria_nombre)
+            self.in_item = False
+        elif name.lower() == "categoria":
+            self.in_Categoria = False
+        elif name.lower() == "subcategoria":
+            print(f" '{self.categoria_actual} > {"".join(self.subcategoria_nombre)}' ")
+            #Al encontrar que termina la subcategoria muestra todo por pantalla directamente para que sea mas simple
+            self.in_SubCategoria = False
+        
+
 
 
 def subcategorias(filename):
-    ...
+    """Muestra todas todas las subcategorias de todos los restaurantes"""
+
+    handler = _HandlerCategorias()
+    xml.sax.parse(filename, handler)
+
+subcategorias("./restaurantes_v1_es_pretty.xml")
 
 
 def info_restaurante(filename, name):
