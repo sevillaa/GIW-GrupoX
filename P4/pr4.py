@@ -3,8 +3,9 @@ TODO: rellenar
 
 Asignatura: GIW
 Práctica 4
-Grupo: XXXXXXX
-Autores: XXXXXX 
+Grupo: 10
+Autores: Miguel Sevilla Benito, Izan de Vega López,
+            Adrián Muñoz Rodríguez, Israel Suárez Fraile, Oier Osorio Illarramendi
 
 Declaramos que esta solución es fruto exclusivamente de nuestro trabajo personal. No hemos
 sido ayudados por ninguna otra persona o sistema automático ni hemos obtenido la solución
