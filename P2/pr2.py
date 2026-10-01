@@ -1,10 +1,8 @@
 """
-TODO: rellenar
-
 Asignatura: GIW
 Práctica 2
 Grupo: 10
-Autores: Izan de Vega
+Autores: Izan de Vega, Miguel
 
 Declaramos que esta solución es fruto exclusivamente de nuestro trabajo personal. No hemos
 sido ayudados por ninguna otra persona o sistema automático ni hemos obtenido la solución
@@ -16,8 +14,12 @@ resultados de los demás.
 
 # https://docs.python.org/3/library/csv.html
 import csv
-
+import json
 from pprint import pprint
+
+from geopy.geocoders import Photon
+from geopy import distance
+
 
 ### Formato CSV
 def lee_fichero_accidentes(ruta):
@@ -86,19 +88,112 @@ def puntos_negros_distrito(datos, distrito, k):
 
 #### Formato JSON
 def leer_monumentos(ruta):
+    """Lee el fichero JSON y devuelve su lista de monumentos."""
     with open(ruta, 'r', encoding='utf-8') as archivo:
         datos = json.load(archivo)
-    print(datos)
+    return datos["@graph"]
+
+
+def obtener_cantidad(pareja):
+    """Devuelve la cantidad, situada en la segunda posición de la pareja."""
+    return pareja[1]
 
 
 def codigos_postales(monumentos):
-    ...
+    """
+    Devuelve una lista de parejas (código postal, número de monumentos),
+    ordenada de mayor a menor por número de monumentos.
+    En caso de empate, conserva el orden de primera aparición.
+    """
+    conteo = {}
+
+    for monumento in monumentos:
+        codigo = monumento["address"]["postal-code"]
+
+        if codigo not in conteo:
+            conteo[codigo] = 1
+        else:
+            conteo[codigo] += 1
+
+    resultado = list(conteo.items())
+    resultado.sort(key=obtener_cantidad, reverse=True)
+
+    return resultado
+
 
 def busqueda_palabras_clave(monumentos, palabras):
-    ...
+    """
+    Devuelve un conjunto de parejas (título, distrito) de los monumentos
+    que contienen todas las palabras clave entre su título y descripción,
+    sin distinguir mayúsculas y minúsculas.
+    Si no existe el distrito, utiliza una cadena vacía.
+    """
+    resultado = set()
+
+    for monumento in monumentos:
+        titulo = monumento["title"]
+        descripcion = monumento["organization"]["organization-desc"]
+
+        titulo_minusculas = titulo.lower()
+        descripcion_minusculas = descripcion.lower()
+        cumple = True
+
+        for palabra in palabras:
+            palabra = palabra.lower()
+
+            if palabra not in titulo_minusculas and palabra not in descripcion_minusculas:
+                cumple = False
+                break
+
+        if cumple:
+            distrito = monumento.get("address", {}).get("district", {}).get("@id", "")
+            resultado.add((titulo, distrito))
+
+    return resultado
+
+
+def obtener_distancia(terna):
+    """Devuelve la distancia, situada en la tercera posición."""
+    return terna[2]
+
 
 def busqueda_distancia(monumentos, direccion, distancia):
-    ...
+    """
+    Devuelve una lista de ternas (título, id, distancia en kilómetros)
+    de los monumentos a menos de la distancia indicada desde la dirección.
+    Ordena de más cercano a más lejano, conservando el orden original
+    en caso de empate. Ignora los monumentos sin coordenadas.
+    """
+    resultado = []
+
+    geolocalizador = Photon(user_agent="giw_practica2", timeout=10)
+    ubicacion = geolocalizador.geocode(direccion)
+
+    if ubicacion is None:
+        return resultado
+
+    origen = (ubicacion.latitude, ubicacion.longitude)
+
+    for monumento in monumentos:
+        localizacion = monumento.get("location", {})
+        latitud = localizacion.get("latitude")
+        longitud = localizacion.get("longitude")
+
+        if latitud is None or longitud is None:
+            continue
+
+        destino = (latitud, longitud)
+        kilometros = distance.distance(origen, destino).km
+
+        if kilometros < distancia:
+            resultado.append(
+                (monumento["title"], monumento["id"], kilometros)
+            )
+
+    resultado.sort(key=obtener_distancia)
+
+    return resultado
+
 
 if __name__ == "__main__":
     pprint("Ejercicio 1:")
@@ -111,5 +206,17 @@ if __name__ == "__main__":
     pprint("Top 5 puntos negros Centro")
     pprint(puntos_negros_distrito(data, "CENTRO", 5))
 
-    pprint("Ejercicio 2:")
-    # leer_monumentos("300356-2-monumentos-ciudad-madrid-json.json")
+    print("\nEjercicio 2:")
+    monumentos = leer_monumentos("300356-2-monumentos-ciudad-madrid-json.json")
+    print("Monumentos leídos:", len(monumentos))
+
+    print("Primeros cinco códigos postales:")
+    pprint(codigos_postales(monumentos)[:5])
+
+    print("Búsqueda de palabras clave:")
+    pprint(busqueda_palabras_clave(monumentos, ["Alfonso", "XII"]))
+
+    print("Monumentos a menos de 1 km de la facultad:")
+    pprint(busqueda_distancia(
+        monumentos, "Profesor José García Santesmases 9, Madrid, España", 1
+    ))
