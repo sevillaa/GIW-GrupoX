@@ -18,7 +18,9 @@ resultados de los demás.
 import html
 import xml.sax
 from xml.etree import ElementTree
-
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+import bisect
 
 class _HandlerRestaurante(xml.sax.ContentHandler):
 
@@ -96,7 +98,7 @@ def subcategorias(filename):
     handler = _HandlerCategorias()
     xml.sax.parse(filename, handler)
 
-subcategorias("./restaurantes_v1_es_pretty.xml")
+subcategorias("restaurantes_v1_es_pretty.xml")
 
 
 def info_restaurante(filename, name):
@@ -139,11 +141,66 @@ def info_restaurante(filename, name):
     return None
 
 
+
+#Ejercicio 4
 def busqueda_cercania(filename, lugar, n):
-    ...
+    """"Devuelve una lista de restaurantes que esten a menos de n km de lugar, ordenados de más cercano a más lejano"""
+
+    arbol = ElementTree.parse(filename)
+
+    ResultList = []
+
+    localizador = Nominatim(user_agent="ej4")
+    localizacion = localizador.geocode(lugar)#Buscamos el lugar utilizando nominatim
+    if localizacion is None:
+        print("La calle no existe")
+        return None
+
+    datos = localizacion.raw#Saca los datos en formato json
+
+    lat = datos["lat"]
+    lon = datos["lon"]
+
+    origen = (lat, lon)
+
+    for element in arbol.iter("service"):
+        nodo_nombre = element.find(".//name")#Busca la etiqueta name en todos los hijos del service
+        if nodo_nombre is None:
+            continue
+
+        nombre_restaurante = html.unescape(nodo_nombre.text).strip()
+
+        geoData = element.find("geoData")
+        if geoData is None:
+            continue
+
+        latitud = geoData.find("latitude")
+        longitud = geoData.find("longitude")
+        if latitud is None or longitud is None:
+            continue
+
+        destino = (latitud.text, longitud.text)
+
+        distancia = geodesic(origen, destino)
+
+        if distancia.kilometers <= n:
+            ResultList.append((distancia.kilometers, nombre_restaurante))#Añade al final
+
+    ResultList.sort(key=lambda p: p[0])#Cuando tenemos ya la lista completa la ordenamos para devolverla en base 
+    #al elemento 0 de la pareja p que es la distancia
+    return ResultList
+
+
+        
+
+
 
 if __name__ == "__main__":
     infoRestaurante = info_restaurante(
         "restaurantes_v1_es_pretty.xml", "La Charca Restaurante"
     )
     print(infoRestaurante)
+    listaCercanos = busqueda_cercania(
+        "restaurantes_v1_es_pretty.xml", "Profesor José García Santesmases 9, Madrid, España", 2.5
+        )
+    print(listaCercanos)
