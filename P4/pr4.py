@@ -26,7 +26,7 @@ def crear_bd(db_filename):
     Cierra el cursor y la conexión al terminar.
     """
     conn = sq.connect(db_filename)
-    conn.execute("PRAGMA foreign_keys = ON") 
+    conn.execute("PRAGMA foreign_keys = ON")
     cur = conn.cursor()
     try:
         cur.execute("""
@@ -88,18 +88,22 @@ def cargar_bd(db_filename, tab_datos, tab_ibex35):
 
     finally:
         cur.close()
-        conn.close() 
+        conn.close()
 
 
 
 def consulta1(db_filename, indice):
+    '''Devuelve una lista de tuplas.
+    Cada tupla contiene un ticker y el nombre asociado
+    Solo se devolverán tuplas cuyo indice sea el dado en 'indice'
+    Se devuelven en orden ascendente de ticker'''
     conn = sq.connect(db_filename)
     try:
         cur = conn.execute("SELECT ticker, nombre "
         "FROM datos_generales "
         "WHERE indice=? "
         "ORDER BY ticker", [indice])
-        return [res for res in cur.fetchall()]
+        return list(cur.fetchall())
     finally:
         conn.close()
 
