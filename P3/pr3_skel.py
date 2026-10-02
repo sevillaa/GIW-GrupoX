@@ -20,7 +20,6 @@ import xml.sax
 from xml.etree import ElementTree
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
-import bisect
 
 class _HandlerRestaurante(xml.sax.ContentHandler):
 
