@@ -28,25 +28,27 @@ def crear_bd(db_filename):
     conn = sq.connect(db_filename)
     conn.execute("PRAGMA foreign_keys = ON") 
     cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE datos_generales (
-            ticker TEXT PRIMARY KEY,
-            nombre TEXT,
-            indice TEXT,
-            pais TEXT
-        )
-    """)
-    cur.execute("""
-        CREATE TABLE semanales_IBEX35 (
-            ticker TEXT,
-            fecha TEXT,
-            precio REAL,
-            PRIMARY KEY (ticker, fecha),
-            FOREIGN KEY (ticker) REFERENCES datos_generales(ticker)
-        )
-    """)
-    cur.close()
-    conn.close()
+    try:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS datos_generales (
+                ticker TEXT PRIMARY KEY,
+                nombre TEXT,
+                indice TEXT,
+                pais TEXT
+            )
+        """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS semanales_IBEX35 (
+                ticker TEXT,
+                fecha TEXT,
+                precio REAL,
+                PRIMARY KEY (ticker, fecha),
+                FOREIGN KEY (ticker) REFERENCES datos_generales(ticker)
+            )
+        """)
+    finally:
+        cur.close()
+        conn.close()
 
 
 def cargar_bd(db_filename, tab_datos, tab_ibex35):
@@ -91,7 +93,15 @@ def cargar_bd(db_filename, tab_datos, tab_ibex35):
 
 
 def consulta1(db_filename, indice):
-    ...
+    conn = sq.connect(db_filename)
+    try:
+        cur = conn.execute("SELECT ticker, nombre "
+        "FROM datos_generales "
+        "WHERE indice=? "
+        "ORDER BY ticker", [indice])
+        return [res for res in cur.fetchall()]
+    finally:
+        conn.close()
 
 
 def consulta2(db_filename):
@@ -107,4 +117,7 @@ def consulta4(db_filename, ticker):
 
 
 if __name__ == "__main__":
-    crear_bd("fichero.db")
+    database_name ="database.sqlite3"
+    crear_bd(database_name)
+    cargar_bd(database_name, "Tabla1.csv","Tabla2.csv")
+    print(consulta1(database_name,"Nasdaq 100"))
