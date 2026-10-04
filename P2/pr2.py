@@ -29,7 +29,7 @@ def lee_fichero_accidentes(ruta):
     siguientes filas. 
     De forma que devuelve un array de diccionarios a partir del fichero en 'ruta' 
     '''
-    with open(ruta, "r", newline='', encoding='utf8') as fich:
+    with open(ruta, "r", newline='', encoding='utf-8-sig') as fich:
         # DictReader lee el csv como un diccionario.
         # Las claves están en la primera fila, los valores para cada clave están
         # en el mismo indice de columna que la clave correspondiente
@@ -64,7 +64,7 @@ def dias_mas_accidentes(datos):
             ret_val[val["fecha"]] += 1
             greatest_value = max(ret_val[val["fecha"]], greatest_value)
 
-    return [(key,value) for key,value in ret_val.items() if value == greatest_value]
+    return {(key,value) for key,value in ret_val.items() if value == greatest_value}
 
 def puntos_negros_distrito(datos, distrito, k):
     '''returns a list of pairs. The first element of the pair contains the concrete point 
@@ -92,7 +92,7 @@ def puntos_negros_distrito(datos, distrito, k):
 #### Formato JSON
 def leer_monumentos(ruta):
     """Lee el fichero JSON y devuelve su lista de monumentos."""
-    with open(ruta, 'r', encoding='utf-8') as archivo:
+    with open(ruta, 'r', encoding='utf-8-sig') as archivo:
         datos = json.load(archivo)
     return datos["@graph"]
 
