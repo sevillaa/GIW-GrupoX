@@ -20,7 +20,7 @@ import xml.sax
 from xml.etree import ElementTree
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
-
+#Ejercicio 1
 class _HandlerRestaurante(xml.sax.ContentHandler):
 
     def __init__(self): #Inicializador de la clase
@@ -40,7 +40,31 @@ class _HandlerRestaurante(xml.sax.ContentHandler):
         if self.in_name:
             self.current_text.append(content)
 
-    
+    def endElement(self, name):
+
+        if name.lower() == "name" and self.in_name:
+
+            raw = "".join(self.current_text)
+            # Desescapar HTML + limpiar espacios
+            cleaned = html.unescape(raw).strip()
+            if cleaned:
+                self.names.append(cleaned)
+                        
+            # se resetea el estado
+            self.in_name = False
+            self.current_text = []
+
+def nombres_restaurantes(filename):
+
+    """devuelve la lista alfabetica de restaurantes"""
+    parser = xml.sax.make_parser()
+    h = _HandlerRestaurante()
+    parser.setContentHandler(h)
+            
+    with open(filename, "r", encoding="utf-8") as f:
+        parser.parse(f)
+    return sorted(h.names)
+
 #Ejercicio 2
 class _HandlerCategorias(xml.sax.ContentHandler):
 
