@@ -99,7 +99,7 @@ def subcategorias(filename):
 
 subcategorias("restaurantes_v1_es_pretty.xml")
 
-
+#Ejercicio 3
 def info_restaurante(filename, name):
     """Devuelve un diccionario con la información del restaurante si existe,
     o None si no existe en el fichero"""
