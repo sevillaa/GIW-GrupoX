@@ -223,11 +223,11 @@ def busqueda_cercania_aux(arbol,origen,max_dist):
 
 
 if __name__ == "__main__":
-    noms = subcategorias(
-        "restaurantes_v1_es_pretty.xml"
-    )
-    print(noms)
-    # listaCercanos = busqueda_cercania(
-    #     "restaurantes_v1_es_pretty.xml", "Profesor José García Santesmases 9, Madrid, España", 2.5
-    #     )
-    # print(listaCercanos)
+    # noms = info_restaurante(
+    #     "restaurantes_v1_es_pretty.xml", "La Charca Restaurante"
+    # )
+    # print(noms)
+    listaCercanos = busqueda_cercania(
+        "restaurantes_v1_es_pretty.xml", "Profesor José García Santesmases 9, Madrid, España", 2.5
+        )
+    print(listaCercanos)

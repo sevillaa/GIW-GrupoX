@@ -3,7 +3,8 @@ Reparto Práctica 3
     - Ejercicio 2: Subcategorías de cocina -> Oier Osorio Illarramendi
     - Ejercicio 3: Información de un restaurante -> Adrián Muñoz Rodríguez
     - Ejercicio 4: Restaurantes por cercanía -> Oier Osorio Illarramendi
-    - Correciones Pylint y repaso general -> Izan de Vega
+    - Correciones Pylint -> Izan de Vega
+    - Repaso general -> Izan de Vega, Miguel Sevilla
     
 Entrega lista -> 11/09/26
 Plazo entrega final -> 18/10/26
