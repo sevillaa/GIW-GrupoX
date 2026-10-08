@@ -77,6 +77,7 @@ class _HandlerCategorias(xml.sax.ContentHandler):
         #Guarda el nombre de la categoria para recordarla entre subcategorias
         self.categoria_actual = ""
         self.in_item = False
+        self.listado_categorias = set()
 
     def startElement(self, name, attrs):
 
@@ -109,7 +110,9 @@ class _HandlerCategorias(xml.sax.ContentHandler):
         elif name.lower() == "categoria":
             self.in_categoria = False
         elif name.lower() == "subcategoria":
-            print(f" '{self.categoria_actual} > {"".join(self.subcategoria_nombre)}' ")
+            string_return = self.categoria_actual + " > " + "".join(self.subcategoria_nombre)
+            self.listado_categorias.add(string_return)
+            # print(f" '{self.categoria_actual} > {"".join(self.subcategoria_nombre)}' ")
             # Al encontrar que termina la subcategoria muestra todo
             # por pantalla directamente para que sea mas simple
             self.in_subcategoria = False
@@ -120,6 +123,7 @@ def subcategorias(filename):
 
     handler = _HandlerCategorias()
     xml.sax.parse(filename, handler)
+    return {elem for elem in handler.listado_categorias}
 
 subcategorias("restaurantes_v1_es_pretty.xml")
 
@@ -175,7 +179,7 @@ def busqueda_cercania(filename, lugar, n):
     localizador = Nominatim(user_agent="ej4")
     localizacion = localizador.geocode(lugar)#Buscamos el lugar utilizando nominatim
     if localizacion is None:
-        print("La calle no existe")
+        # print("La calle no existe")
         return None
 
     datos = localizacion.raw#Saca los datos en formato json
@@ -219,11 +223,11 @@ def busqueda_cercania_aux(arbol,origen,max_dist):
 
 
 if __name__ == "__main__":
-    infoRestaurante = info_restaurante(
-        "restaurantes_v1_es_pretty.xml", "La Charca Restaurante"
+    noms = subcategorias(
+        "restaurantes_v1_es_pretty.xml"
     )
-    print(infoRestaurante)
-    listaCercanos = busqueda_cercania(
-        "restaurantes_v1_es_pretty.xml", "Profesor José García Santesmases 9, Madrid, España", 2.5
-        )
-    print(listaCercanos)
+    print(noms)
+    # listaCercanos = busqueda_cercania(
+    #     "restaurantes_v1_es_pretty.xml", "Profesor José García Santesmases 9, Madrid, España", 2.5
+    #     )
+    # print(listaCercanos)
