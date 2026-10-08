@@ -105,12 +105,12 @@ class _HandlerCategorias(xml.sax.ContentHandler):
 
         if name.lower() == "item":
             if self.in_categoria and not self.in_subcategoria:
-                self.categoria_actual = "".join(self.categoria_nombre)
+                self.categoria_actual = html.unescape("".join(self.categoria_nombre)).strip()
             self.in_item = False
         elif name.lower() == "categoria":
             self.in_categoria = False
         elif name.lower() == "subcategoria":
-            string_return = self.categoria_actual + " > " + "".join(self.subcategoria_nombre)
+            string_return = self.categoria_actual + " > " + html.unescape("".join(self.subcategoria_nombre)).strip()
             self.listado_categorias.add(string_return)
             # print(f" '{self.categoria_actual} > {"".join(self.subcategoria_nombre)}' ")
             # Al encontrar que termina la subcategoria muestra todo
@@ -124,8 +124,6 @@ def subcategorias(filename):
     handler = _HandlerCategorias()
     xml.sax.parse(filename, handler)
     return handler.listado_categorias
-
-subcategorias("restaurantes_v1_es_pretty.xml")
 
 #Ejercicio 3
 def info_restaurante(filename, name):
@@ -220,14 +218,3 @@ def busqueda_cercania_aux(arbol,origen,max_dist):
         if distancia.kilometers <= max_dist:
             result_list.append((distancia.kilometers, nombre_restaurante))#Añade al final
     return result_list
-
-
-if __name__ == "__main__":
-    # noms = info_restaurante(
-    #     "restaurantes_v1_es_pretty.xml", "La Charca Restaurante"
-    # )
-    # print(noms)
-    listaCercanos = busqueda_cercania(
-        "restaurantes_v1_es_pretty.xml", "Profesor José García Santesmases 9, Madrid, España", 2.5
-        )
-    print(listaCercanos)
