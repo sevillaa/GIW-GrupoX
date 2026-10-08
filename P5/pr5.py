@@ -18,11 +18,21 @@ resultados de los demás.
 
 URL = 'https://books.toscrape.com/'
 
+import requests
+
 
 # APARTADO 1 #
 def categorias():
     """ Devuelve un conjunto de parejas (nombre, número libros) de todas las categorías """
-    ...
+    res = requests.get(URL)
+    try:
+        res.raise_for_status()
+        archivo = open("Archivo.txt","wb")
+        for bloque in res.iter_content(10000):
+        archivo.write(bloque)
+        archivo.close()
+    except:
+        print ("Hubo un problema")
 
 
 # APARTADO 2 #
