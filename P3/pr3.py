@@ -123,7 +123,7 @@ def subcategorias(filename):
 
     handler = _HandlerCategorias()
     xml.sax.parse(filename, handler)
-    return {elem for elem in handler.listado_categorias}
+    return handler.listado_categorias
 
 subcategorias("restaurantes_v1_es_pretty.xml")
 
