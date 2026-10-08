@@ -49,7 +49,7 @@ class _HandlerRestaurante(xml.sax.ContentHandler):
             cleaned = html.unescape(raw).strip()
             if cleaned:
                 self.names.append(cleaned)
-                        
+
             # se resetea el estado
             self.in_name = False
             self.current_text = []
@@ -60,7 +60,7 @@ def nombres_restaurantes(filename):
     parser = xml.sax.make_parser()
     h = _HandlerRestaurante()
     parser.setContentHandler(h)
-            
+
     with open(filename, "r", encoding="utf-8") as f:
         parser.parse(f)
     return sorted(h.names)
@@ -70,19 +70,20 @@ class _HandlerCategorias(xml.sax.ContentHandler):
 
     def __init__(self):
         super().__init__()
-        self.in_Categoria = False
-        self.in_SubCategoria = False
+        self.in_categoria = False
+        self.in_subcategoria = False
         self.categoria_nombre = []
         self.subcategoria_nombre = []
-        self.categoria_actual = ""#Guarda el nombre de la categoria para recordarla entre subcategorias
+        #Guarda el nombre de la categoria para recordarla entre subcategorias
+        self.categoria_actual = ""
         self.in_item = False
 
     def startElement(self, name, attrs):
 
         if name.lower() == "categoria":
-            self.in_Categoria = True
+            self.in_categoria = True
         elif name.lower() == "subcategoria":
-            self.in_SubCategoria = True
+            self.in_subcategoria = True
         elif name.lower() == "item":
             label = attrs.get("name")
             if label.lower() == "categoria":
@@ -94,25 +95,24 @@ class _HandlerCategorias(xml.sax.ContentHandler):
 
 
     def characters(self, content):
-        if self.in_Categoria and not self.in_SubCategoria and self.in_item:
-            self.categoria_nombre.append(content) 
-        elif self.in_SubCategoria and self.in_Categoria and self.in_item:
+        if self.in_categoria and not self.in_subcategoria and self.in_item:
+            self.categoria_nombre.append(content)
+        elif self.in_subcategoria and self.in_categoria and self.in_item:
             self.subcategoria_nombre.append(content)
 
     def endElement(self, name):
 
         if name.lower() == "item":
-            if self.in_Categoria and not self.in_SubCategoria:
+            if self.in_categoria and not self.in_subcategoria:
                 self.categoria_actual = "".join(self.categoria_nombre)
             self.in_item = False
         elif name.lower() == "categoria":
-            self.in_Categoria = False
+            self.in_categoria = False
         elif name.lower() == "subcategoria":
             print(f" '{self.categoria_actual} > {"".join(self.subcategoria_nombre)}' ")
-            #Al encontrar que termina la subcategoria muestra todo por pantalla directamente para que sea mas simple
-            self.in_SubCategoria = False
-        
-
+            # Al encontrar que termina la subcategoria muestra todo
+            # por pantalla directamente para que sea mas simple
+            self.in_subcategoria = False
 
 
 def subcategorias(filename):
@@ -167,11 +167,10 @@ def info_restaurante(filename, name):
 
 #Ejercicio 4
 def busqueda_cercania(filename, lugar, n):
-    """"Devuelve una lista de restaurantes que esten a menos de n km de lugar, ordenados de más cercano a más lejano"""
+    """"Devuelve una lista de restaurantes que esten 
+    a menos de n km de lugar, ordenados de más cercano a más lejano"""
 
     arbol = ElementTree.parse(filename)
-
-    ResultList = []
 
     localizador = Nominatim(user_agent="ej4")
     localizacion = localizador.geocode(lugar)#Buscamos el lugar utilizando nominatim
@@ -184,8 +183,16 @@ def busqueda_cercania(filename, lugar, n):
     lat = datos["lat"]
     lon = datos["lon"]
 
-    origen = (lat, lon)
+    result_list = busqueda_cercania_aux(arbol, (lat, lon), n)
 
+    # Cuando tenemos ya la lista completa la ordenamos para devolverla en base
+    # al elemento 0 de la pareja p que es la distancia
+    result_list.sort(key=lambda p: p[0])
+    return result_list
+
+def busqueda_cercania_aux(arbol,origen,max_dist):
+    '''Returns the unoredered result list for busqueda_cercania'''
+    result_list = []
     for element in arbol.iter("service"):
         nodo_nombre = element.find(".//name")#Busca la etiqueta name en todos los hijos del service
         if nodo_nombre is None:
@@ -193,12 +200,12 @@ def busqueda_cercania(filename, lugar, n):
 
         nombre_restaurante = html.unescape(nodo_nombre.text).strip()
 
-        geoData = element.find("geoData")
-        if geoData is None:
+        geo_data = element.find("geoData")
+        if geo_data is None:
             continue
 
-        latitud = geoData.find("latitude")
-        longitud = geoData.find("longitude")
+        latitud = geo_data.find("latitude")
+        longitud = geo_data.find("longitude")
         if latitud is None or longitud is None:
             continue
 
@@ -206,16 +213,9 @@ def busqueda_cercania(filename, lugar, n):
 
         distancia = geodesic(origen, destino)
 
-        if distancia.kilometers <= n:
-            ResultList.append((distancia.kilometers, nombre_restaurante))#Añade al final
-
-    ResultList.sort(key=lambda p: p[0])#Cuando tenemos ya la lista completa la ordenamos para devolverla en base 
-    #al elemento 0 de la pareja p que es la distancia
-    return ResultList
-
-
-        
-
+        if distancia.kilometers <= max_dist:
+            result_list.append((distancia.kilometers, nombre_restaurante))#Añade al final
+    return result_list
 
 
 if __name__ == "__main__":
