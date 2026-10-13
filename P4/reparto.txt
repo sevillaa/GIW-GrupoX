@@ -3,5 +3,5 @@ Reparto Práctica 4
 - cargar DB : Miguel Sevilla
 - consulta 1 : Izan de Vega
 - consulta 2
-- consulta 3
+- consulta 3 : Adrián Muñoz Rodríguez
 - consulta 4 : Oier Osorio Illarramendi
