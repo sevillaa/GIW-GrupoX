@@ -117,11 +117,27 @@ def consulta3(db_filename, limite):
 
 
 def consulta4(db_filename, ticker):
-    ...
+    """ Devuelve tuplas del historico del valor de las acciones asociadas al ticker de entrada
+     ordenado de más reciente a más antiguo"""
+
+    conn = sq.connect(db_filename)
+
+    try:
+        cur = conn.execute(""
+        "SELECT ticker, date(fecha), precio "
+        "FROM semanales_IBEX35 "
+        "WHERE ticker = ? "
+        "ORDER BY fecha DESC", [ticker])
+        return list(cur.fetchall())
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":
     database_name ="database.sqlite3"
-    crear_bd(database_name)
-    cargar_bd(database_name, "Tabla1.csv","Tabla2.csv")
+    #crear_bd(database_name)
+    #cargar_bd(database_name, "Tabla1.csv","Tabla2.csv")
     print(consulta1(database_name,"Nasdaq 100"))
+
+
+    print(consulta4(database_name, "ACS"))
