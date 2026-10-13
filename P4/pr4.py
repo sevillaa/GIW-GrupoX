@@ -130,7 +130,8 @@ def consulta2(db_filename):
 
 def consulta3(db_filename, limite):
     """Devuelve una lista de tuplas (ticker, nombre, precio_promedio, diferencia).
-    Solo incluye acciones cuyo precio promedio sea superior a 'limite' y ordenado por precio promedio descendente."""
+    Solo incluye acciones cuyo precio promedio sea superior a 'limite'
+    y ordenado por precio promedio descendente."""
     conn = sq.connect(db_filename)
     try:
         cur = conn.execute("""
