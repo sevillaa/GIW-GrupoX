@@ -113,7 +113,24 @@ def consulta2(db_filename):
 
 
 def consulta3(db_filename, limite):
-    ...
+    """Devuelve una lista de tuplas (ticker, nombre, precio_promedio, diferencia).
+    Solo incluye acciones cuyo precio promedio sea superior a 'limite' y ordenado por precio promedio descendente."""
+    conn = sq.connect(db_filename)
+    try:
+        cur = conn.execute("""
+            SELECT dg.ticker,
+                   dg.nombre,
+                   AVG(s.precio) AS precio_promedio,
+                   (MAX(s.precio) - MIN(s.precio)) AS diferencia
+            FROM datos_generales dg
+            JOIN semanales_IBEX35 s ON dg.ticker = s.ticker
+            GROUP BY dg.ticker, dg.nombre
+            HAVING precio_promedio > ?
+            ORDER BY precio_promedio DESC
+        """, [limite])
+        return list(cur.fetchall())
+    finally:
+        conn.close()
 
 
 def consulta4(db_filename, ticker):
