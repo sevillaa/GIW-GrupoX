@@ -109,7 +109,23 @@ def consulta1(db_filename, indice):
 
 
 def consulta2(db_filename):
-    ...
+    """Devuelve una lista de tuplas (ticker, nombre, precio máximo)
+    de las distintas acciones del IBEX35 según datos históricos
+    ordenados por nombre ascendente"""
+    con = sq.connect(db_filename)
+
+    try:
+        cur = con.execute(
+            "SELECT s.ticker, g.nombre, MAX(s.precio) "
+            "FROM semanales_IBEX35 s "
+            "JOIN datos_generales g on s.ticker = g.ticker "
+            "GROUP BY s.ticker, g.nombre "
+            "ORDER BY g.nombre"
+        )
+        return cur.fetchall()
+    finally:
+        con.close()
+
 
 
 def consulta3(db_filename, limite):

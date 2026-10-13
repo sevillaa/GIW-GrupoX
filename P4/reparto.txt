@@ -2,6 +2,6 @@ Reparto Práctica 4
 - crear DB : Izan de Vega + Miguel Sevilla
 - cargar DB : Miguel Sevilla
 - consulta 1 : Izan de Vega
-- consulta 2
+- consulta 2 : Israel Suarez
 - consulta 3 : Adrián Muñoz Rodríguez
 - consulta 4 : Oier Osorio Illarramendi
