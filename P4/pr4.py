@@ -1,6 +1,4 @@
 """
-TODO: rellenar
-
 Asignatura: GIW
 Práctica 4
 Grupo: 10
@@ -104,6 +102,7 @@ def consulta1(db_filename, indice):
         "WHERE indice=? "
         "ORDER BY ticker", [indice])
         return list(cur.fetchall())
+        #¿devolver directamente cur.fetchall()?  -> igual en 147 y 164
     finally:
         conn.close()
 
@@ -166,12 +165,3 @@ def consulta4(db_filename, ticker):
     finally:
         conn.close()
 
-
-if __name__ == "__main__":
-    database_name ="database.sqlite3"
-    #crear_bd(database_name)
-    #cargar_bd(database_name, "Tabla1.csv","Tabla2.csv")
-    print(consulta1(database_name,"Nasdaq 100"))
-
-
-    print(consulta4(database_name, "ACS"))
