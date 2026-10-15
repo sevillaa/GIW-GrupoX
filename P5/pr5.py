@@ -21,23 +21,25 @@ from bs4 import BeautifulSoup
 URL = 'https://books.toscrape.com/'
 TIMEOUT = 10
 
+def get_beautiful_soup_from_html(url):
+    if url is None:
+        return None
+    res = requests.get(url, timeout=TIMEOUT)
+    res.raise_for_status()
+    res.encoding = 'utf-8'
+    html = res.text
+    return BeautifulSoup(html, features="lxml")
 
 # APARTADO 1 #
 def categorias():
     """ Devuelve un conjunto de parejas (nombre, número libros) de todas las categorías """
-    res = requests.get(URL, timeout=TIMEOUT)
     s = set()
-
-    res.raise_for_status()
-    res.encoding = 'utf-8'
-    html = res.text
-    soup = BeautifulSoup(html, features="lxml")
+    soup = get_beautiful_soup_from_html(URL)
     # The element that contains the list of categories
     # is the first <ul> element with no attributes inside
     mydivs = soup.find(ul_with_no_attrs)
     for a in mydivs.find_all("a"):
         s.add(explora_categoria(a.get("href")))
-
     return s
 
 def ul_with_no_attrs(tag):
@@ -51,11 +53,7 @@ def explora_categoria(url):
     if url is None:
         return (None, None)
     category_url = urljoin(URL,url)
-    res = requests.get(category_url, timeout=TIMEOUT)
-    res.raise_for_status()
-    res.encoding = 'utf-8'
-    html = res.text
-    soup = BeautifulSoup(html, features="lxml")
+    soup = get_beautiful_soup_from_html(category_url)
     name_tag = soup.select_one("div.page-header.action h1")
     number_tag = soup.select_one("form.form-horizontal strong")
     if name_tag is None or number_tag is None:
@@ -72,11 +70,7 @@ def url_categoria(nombre):
     Ignora espacios exteriores y diferencias entre mayúsculas y minúsculas.
     """
     nombre = nombre.strip().lower()
-    res = requests.get(URL, timeout=TIMEOUT)
-    res.raise_for_status()
-    res.encoding = 'utf-8'
-    soup = BeautifulSoup(res.text, features="lxml")
-
+    soup = get_beautiful_soup_from_html(URL)
     for enlace in soup.select(".side_categories ul ul a"):
         if enlace.get_text(strip=True).lower() == nombre:
             return urljoin(URL, enlace["href"])
@@ -95,11 +89,7 @@ def libros_categoria(nombre):
     valoraciones = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
 
     while url is not None:
-        res = requests.get(url, timeout=TIMEOUT)
-        res.raise_for_status()
-        res.encoding = 'utf-8'
-        soup = BeautifulSoup(res.text, features="lxml")
-
+        soup = get_beautiful_soup_from_html(url)
         for libro in soup.select("article.product_pod"):
             # El texto visible puede estar recortado, pero title contiene el completo.
             titulo = libro.select_one("h3 a")["title"]
@@ -115,3 +105,6 @@ def libros_categoria(nombre):
         url = urljoin(url, siguiente["href"]) if siguiente is not None else None
 
     return libros
+
+if __name__ == "__main__":
+    print(categorias())
