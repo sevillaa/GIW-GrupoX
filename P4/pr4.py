@@ -164,4 +164,3 @@ def consulta4(db_filename, ticker):
         return list(cur.fetchall())
     finally:
         conn.close()
-
