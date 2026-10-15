@@ -164,9 +164,3 @@ def consulta4(db_filename, ticker):
         return cur.fetchall()
     finally:
         conn.close()
-
-if __name__ == "__main__":
-    database_name ="database.sqlite3"
-    # crear_bd(database_name)
-    # cargar_bd(database_name, "Tabla1.csv","Tabla2.csv")
-    print(consulta1(database_name,"Nasdaq 100"))
