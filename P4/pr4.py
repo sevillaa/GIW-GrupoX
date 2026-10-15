@@ -101,7 +101,7 @@ def consulta1(db_filename, indice):
         "FROM datos_generales "
         "WHERE indice=? "
         "ORDER BY ticker", [indice])
-        return list(cur.fetchall())
+        return cur.fetchall()
         #¿devolver directamente cur.fetchall()?  -> igual en 147 y 164
     finally:
         conn.close()
@@ -144,7 +144,7 @@ def consulta3(db_filename, limite):
             HAVING precio_promedio > ?
             ORDER BY precio_promedio DESC
         """, [limite])
-        return list(cur.fetchall())
+        return cur.fetchall()
     finally:
         conn.close()
 
@@ -161,6 +161,12 @@ def consulta4(db_filename, ticker):
         "FROM semanales_IBEX35 "
         "WHERE ticker = ? "
         "ORDER BY fecha DESC", [ticker])
-        return list(cur.fetchall())
+        return cur.fetchall()
     finally:
         conn.close()
+
+if __name__ == "__main__":
+    database_name ="database.sqlite3"
+    # crear_bd(database_name)
+    # cargar_bd(database_name, "Tabla1.csv","Tabla2.csv")
+    print(consulta1(database_name,"Nasdaq 100"))
