@@ -105,6 +105,3 @@ def libros_categoria(nombre):
         url = urljoin(url, siguiente["href"]) if siguiente is not None else None
 
     return libros
-
-if __name__ == "__main__":
-    print(categorias())
