@@ -66,11 +66,52 @@ def explora_categoria(url):
 
 
 # APARTADO 2 #
-def libros_categoria(nombre):
-    """ Dado el nombre de una categoría, devuelve un conjunto de tuplas 
-        (titulo, precio, valoracion), donde el precio será un número real y la 
-        valoración un número natural """
-    ...
+def url_categoria(nombre):
+    """
+    Devuelve la URL de la categoría, o None si no existe.
+    Ignora espacios exteriores y diferencias entre mayúsculas y minúsculas.
+    """
+    nombre = nombre.strip().lower()
+    res = requests.get(URL, timeout=TIMEOUT)
+    res.raise_for_status()
+    res.encoding = 'utf-8'
+    soup = BeautifulSoup(res.text, features="lxml")
 
-if __name__ == "__main__":
-    print(categorias())
+    for enlace in soup.select(".side_categories ul ul a"):
+        if enlace.get_text(strip=True).lower() == nombre:
+            return urljoin(URL, enlace["href"])
+    return None
+
+
+def libros_categoria(nombre):
+    """
+    Devuelve un conjunto de tuplas (titulo, precio, valoracion).
+    Recorre todas las páginas de la categoría y devuelve títulos completos,
+    precios float y valoraciones int. Si la categoría no existe, devuelve set().
+    La búsqueda ignora espacios exteriores y diferencias de mayúsculas.
+    """
+    url = url_categoria(nombre)
+    libros = set()
+    valoraciones = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
+
+    while url is not None:
+        res = requests.get(url, timeout=TIMEOUT)
+        res.raise_for_status()
+        res.encoding = 'utf-8'
+        soup = BeautifulSoup(res.text, features="lxml")
+
+        for libro in soup.select("article.product_pod"):
+            # El texto visible puede estar recortado, pero title contiene el completo.
+            titulo = libro.select_one("h3 a")["title"]
+            precio = float(libro.select_one("p.price_color").get_text(strip=True)
+                           .removeprefix("£"))
+            clases = libro.select_one("p.star-rating")["class"]
+            valoracion = next(valoraciones[clase] for clase in clases
+                              if clase in valoraciones)
+            libros.add((titulo, precio, valoracion))
+
+        siguiente = soup.select_one("li.next a")
+        # Cada enlace next es relativo a la página que acabamos de leer.
+        url = urljoin(url, siguiente["href"]) if siguiente is not None else None
+
+    return libros
