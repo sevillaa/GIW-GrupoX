@@ -1,7 +1,7 @@
 Reparto Práctica 6
 - inserta_usuarios: Oier Osorio Illarramendi
 - get_ident_email: Oier Osorio Illarramendi
-- borra_usuario:
-- inserta_todo: 
+- borra_usuario: Israel Suarez Fraile
+- inserta_todo: Israel Suarez Fraile
 - todos_usuario:
 - todos_no_cumplidos:

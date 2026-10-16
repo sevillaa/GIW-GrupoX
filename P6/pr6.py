@@ -14,6 +14,7 @@ de manera directa o indirecta. Declaramos además que no hemos realizado de mane
 deshonesta ninguna otra actividad que pueda mejorar nuestros resultados ni perjudicar los
 resultados de los demás.
 """
+from asyncio import timeout
 
 import requests
 
@@ -57,15 +58,40 @@ def get_ident_email(email, token):
     return None
 
 def borra_usuario(email, token):
-    """ Elimina el usuario cuyo email sea *exactamente* el pasado como parámetro. En caso de éxito en el
-        borrado devuelve True. Si no existe tal usuario devolverá False """
-    ...
+    """ Elimina el usuario cuyo email sea *exactamente* el pasado como parámetro.
+        En caso de éxito en elborrado devuelve True.
+        Si no existe tal usuario devolverá False """
+    usuario = get_ident_email(email, token)
+    if usuario is None:
+        return False
+    response = requests.delete(
+        f"{BASE_URL}/users/{usuario}",
+        headers={'Authorization' : f'Bearer {token}'},
+        timeout = 10)
+    return response.status_code in (200, 204) #204 es borrado con exito y 200 OK
 
 
 def inserta_todo(email, token, title, due_on, status='pending'):
-    """ Inserta un nuevo ToDo para el usuario con email exactamente igual al pasado. Si el ToDo ha sido insertado
+    """ Inserta un nuevo ToDo para el usuario con email exactamente igual al pasado.
+        Si el ToDo ha sido insertado
         con éxito devolverá True, en otro caso devolverá False """
-    ...
+    usuario = get_ident_email(email, token)
+    if usuario is None:
+        return False
+
+    tarea = {
+        "title" : title,
+        "due_on": due_on,
+        "status": status,
+        "user_id": usuario
+    }
+    response = requests.post(
+        f"{BASE_URL}/todos",
+        json=tarea,
+        headers={'Authorization' : f'Bearer {token}'},
+        timeout = 10)
+
+    return response.status_code == 201 #Significa Created
 
 
 def todos_usuario(email, token):
