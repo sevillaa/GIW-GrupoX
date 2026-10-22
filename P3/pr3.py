@@ -112,9 +112,6 @@ class _HandlerCategorias(xml.sax.ContentHandler):
         elif name.lower() == "subcategoria":
             string_return = self.categoria_actual + " > " + html.unescape("".join(self.subcategoria_nombre)).strip()
             self.listado_categorias.add(string_return)
-            # print(f" '{self.categoria_actual} > {"".join(self.subcategoria_nombre)}' ")
-            # Al encontrar que termina la subcategoria muestra todo
-            # por pantalla directamente para que sea mas simple
             self.in_subcategoria = False
 
 
