@@ -15,6 +15,8 @@ resultados de los demás.
 """
 
 from flask import Flask, request, session, render_template, jsonify
+import requests
+from pprint import pp 
 app = Flask(__name__)
 
 url = 'http://localhost:5000'
@@ -22,7 +24,7 @@ url = 'http://localhost:5000'
 def muestra(r):
     print(r.status_code, r.reason)
     if r.content:
-        print(json.dumps(r.json(), indent=2))
+        pp(r.json())
 
 
 ###
@@ -42,7 +44,7 @@ asignaturas = {
 @app.route('/asignaturas', methods=['GET'])
 def get():
     """Devuelve la lista de asignaturas"""  
-    return jsonify({'asignaturas': asignaturas})
+    return {'asignaturas': asignaturas}
 
 ###
 
