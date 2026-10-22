@@ -15,7 +15,6 @@ resultados de los demás.
 """
 
 from flask import Flask, request, session, render_template, jsonify
-import requests
 from pprint import pp 
 app = Flask(__name__)
 
