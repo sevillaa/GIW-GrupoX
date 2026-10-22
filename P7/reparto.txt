@@ -1,0 +1,15 @@
+asignaturas
+- delete
+- post
+- get
+
+asignaturas/X
+- delete
+- get
+- put
+- patch
+
+asignaturas/X/horario
+- get
+
+Tests de unidad
