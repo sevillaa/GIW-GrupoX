@@ -15,6 +15,7 @@ deshonesta ninguna otra actividad que pueda mejorar nuestros resultados ni perju
 resultados de los demás.
 """
 from asyncio import timeout
+from datetime import datetime
 
 import requests
 
@@ -97,7 +98,21 @@ def inserta_todo(email, token, title, due_on, status='pending'):
 def todos_usuario(email, token):
     """ Devuelve una lista de diccionarios con todos los ToDo asociados al usuario con el email pasado como
         parámetro """
-    ...
+    # obtener id usr
+    user_id = get_ident_email(email, token)
+    if user_id is None:
+        return []
+    # get para obtener datos del usr
+    r = requests.get(
+        f'{BASE_URL}/users/{user_id}/todos',
+        headers={'Authorization': f'Bearer {token}'},
+        timeout=10
+    )
+
+    if r.status_code == 200:
+        return r.json()
+
+    return []
 
 
 def todos_no_cumplidos(email, token):
@@ -105,7 +120,26 @@ def todos_no_cumplidos(email, token):
         parámetro que están pendientes (status=pending) y cuya fecha tope (due_on) es anterior a la fecha
         y hora actual. Para comparar las fechas solo hay que tener en cuenta el dia, la hora y los minutos; es
         decir, ignorar los segundos, microsegundos y el uso horario """
-    ...
+    todos = todos_usuario(email, token)
+    if not todos:
+        return []
+
+    # fecha actual ignorando seg y microseg
+    ahora = datetime.now().replace(second=0, microsecond=0)
+
+    todos_vencidos = []
+
+    for todo in todos:
+        # solo considerar tareas pendientes
+        if todo['status'] == 'pending':
+            fecha_str = todo['due_on'][:16]
+            # convertimos
+            fecha_tope = datetime.strptime(fecha_str, '%Y-%m-%dT%H:%M')
+            # comparar si la fecha tope es anterior (vencida)
+            if fecha_tope < ahora:
+                todos_vencidos.append(todo)
+
+    return todos_vencidos
 
 
 
