@@ -3,5 +3,5 @@ Reparto Práctica 6
 - get_ident_email: Oier Osorio Illarramendi
 - borra_usuario: Israel Suarez Fraile
 - inserta_todo: Israel Suarez Fraile
-- todos_usuario:
-- todos_no_cumplidos:
+- todos_usuario: Adrián Muñoz Rodríguez
+- todos_no_cumplidos: Adrián Muñoz Rodríguez
