@@ -14,7 +14,6 @@ de manera directa o indirecta. Declaramos además que no hemos realizado de mane
 deshonesta ninguna otra actividad que pueda mejorar nuestros resultados ni perjudicar los
 resultados de los demás.
 """
-from asyncio import timeout
 from datetime import datetime
 
 import requests
@@ -96,8 +95,8 @@ def inserta_todo(email, token, title, due_on, status='pending'):
 
 
 def todos_usuario(email, token):
-    """ Devuelve una lista de diccionarios con todos los ToDo asociados al usuario con el email pasado como
-        parámetro """
+    """ Devuelve una lista de diccionarios con todos los ToDo asociados 
+        al usuario con el email pasado como parámetro """
     # obtener id usr
     user_id = get_ident_email(email, token)
     if user_id is None:
@@ -116,10 +115,11 @@ def todos_usuario(email, token):
 
 
 def todos_no_cumplidos(email, token):
-    """ Devuelve una lista de diccionarios con todos los ToDo asociados al usuario con el email pasado como
-        parámetro que están pendientes (status=pending) y cuya fecha tope (due_on) es anterior a la fecha
-        y hora actual. Para comparar las fechas solo hay que tener en cuenta el dia, la hora y los minutos; es
-        decir, ignorar los segundos, microsegundos y el uso horario """
+    """ Devuelve una lista de diccionarios con todos los ToDo asociados al usuario con el 
+        email pasado como parámetro que están pendientes (status=pending) y cuya fecha tope
+        (due_on) es anterior a la fecha y hora actual. Para comparar las fechas solo hay que 
+        tener en cuenta el dia, la hora y los minutos; es decir, ignorar los segundos, 
+        microsegundos y el uso horario """
     todos = todos_usuario(email, token)
     if not todos:
         return []
@@ -141,18 +141,16 @@ def todos_no_cumplidos(email, token):
 
     return todos_vencidos
 
-
-
 if __name__  == "__main__":
     u1 = {'name': 'Eva', 'email': 'eva@gmail.com', 'gender': 'female', 'status': 'inactive'}
     u2 = {'name': 'Ana', 'email': 'ana@gmail.com', 'gender': 'female', 'status': 'active'}
     u3 = {'name': 'Pepe', 'email': 'pepe@gmail.com', 'gender': 'female', 'status': 'inactive'}
     print(inserta_usuarios([u1, u2], REST_TOKEN))
     print(inserta_usuarios([u3, u2], REST_TOKEN))
-    
+
     print(get_ident_email('eva@gmail.com', REST_TOKEN))
     print(get_ident_email('barbara@gmail.com', REST_TOKEN))
-    
+
 
 
     print(inserta_todo("eva@gmail.com", REST_TOKEN, "Todo 1", "2010-10-30 11:30", "pending"))
