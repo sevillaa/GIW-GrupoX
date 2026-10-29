@@ -30,6 +30,7 @@ ID_GEN = count()
 
 def es_int(valor):
     """Comprueba que es int pero no bool"""
+    # isinstance(True, int)   # True (true -> 1)
     return isinstance(valor, int) and not isinstance(valor, bool)
 
 def es_horario_valido(horario):
