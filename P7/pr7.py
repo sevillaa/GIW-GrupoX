@@ -1,6 +1,4 @@
 """
-TODO: rellenar
-
 Asignatura: GIW
 Práctica 7
 Grupo: 10
@@ -89,6 +87,7 @@ def parsear_parametros(args):
         if clave not in ("alumnos_gte", "page", "per_page"):
             return None
     # page y per_page deben aparecer siempre juntos
+    # ¿Por qué? -> Si uno de los dos no aparece, no se puede aplicar el paginado correctamente
     if ("page" in args) != ("per_page" in args):
         return None
     try:
