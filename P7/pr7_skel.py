@@ -25,10 +25,6 @@ asignaturas = {}
 # Generador de IDs únicos e incrementales desde 0 (nunca decrece)
 ID_GEN = count()
 
-# Asignatura válida mínima, usada para validar un PATCH
-BASE = {"nombre": "", "numero_alumnos": 0, "horario": []}
-
-
 # --- Funciones de validación ---
 
 def es_int(valor):
@@ -37,38 +33,66 @@ def es_int(valor):
 
 def es_horario_valido(horario):
     """Valida un bloque {dia, hora_inicio, hora_final}"""
-    return (isinstance(horario, dict)
-            and horario.keys() == {"dia", "hora_inicio", "hora_final"}
-            and isinstance(horario["dia"], str)
-            and es_int(horario["hora_inicio"])
-            and es_int(horario["hora_final"]))
+    if not isinstance(horario, dict) or len(horario) != 3:
+        return False
+
+    for campo in ("dia", "hora_inicio", "hora_final"):
+        if campo not in horario:
+            return False
+
+    if not isinstance(horario["dia"], str):
+        return False
+    if not es_int(horario["hora_inicio"]) or not es_int(horario["hora_final"]):
+        return False
+    return True
+
+def es_lista_horarios_valida(horarios):
+    """Comprueba que todos los bloques de la lista tienen el formato correcto"""
+    if not isinstance(horarios, list):
+        return False
+    for horario in horarios:
+        if not es_horario_valido(horario):
+            return False
+    return True
 
 def es_asig_valida(datos):
     """Exactamente nombre(str), numero_alumnos(int) y horario(lista de bloques válidos)"""
-    return (isinstance(datos, dict)
-            and datos.keys() == {"nombre", "numero_alumnos", "horario"}
-            and isinstance(datos["nombre"], str)
-            and es_int(datos["numero_alumnos"])
-            and isinstance(datos["horario"], list)
-            and all(es_horario_valido(h) for h in datos["horario"]))
+    if not isinstance(datos, dict) or len(datos) != 3:
+        return False
+
+    for campo in ("nombre", "numero_alumnos", "horario"):
+        if campo not in datos:
+            return False
+
+    if not isinstance(datos["nombre"], str) or not es_int(datos["numero_alumnos"]):
+        return False
+    return es_lista_horarios_valida(datos["horario"])
 
 def es_patch_valido(datos):
-    """Exactamente un campo del esquema. Se mezcla con una asignatura válida
-    base: si el campo es desconocido o de tipo incorrecto, la mezcla falla"""
-    #len == 1 porque el PATCH modifica exactamente un campo (y así la mezcla
-    #no puede completar por sí sola las claves que faltan)
-    return (isinstance(datos, dict) and len(datos) == 1
-            and es_asig_valida({**BASE, **datos}))
+    """Comprueba que se modifica un único campo y que su valor es válido"""
+    if not isinstance(datos, dict) or len(datos) != 1:
+        return False
+
+    if "nombre" in datos:
+        return isinstance(datos["nombre"], str)
+    if "numero_alumnos" in datos:
+        return es_int(datos["numero_alumnos"])
+    if "horario" in datos:
+        return es_lista_horarios_valida(datos["horario"])
+    return False
 
 def parsear_parametros(args):
     """Devuelve (alumnos_gte, page, per_page) o None si son incorrectos"""
-    if not args.keys() <= {"alumnos_gte", "page", "per_page"}:
-        return None
+    for clave in args:
+        if clave not in ("alumnos_gte", "page", "per_page"):
+            return None
     # page y per_page deben aparecer siempre juntos
     if ("page" in args) != ("per_page" in args):
         return None
     try:
-        valores = {clave: int(v) for clave, v in args.items()}
+        valores = {}
+        for clave, valor in args.items():
+            valores[clave] = int(valor)
     except ValueError:
         return None
     if valores.get("page", 1) < 1 or valores.get("per_page", 1) < 1:
@@ -86,8 +110,10 @@ def listar_asignaturas():
         return '', 400
     minimo, pagina, tam_pagina = params
     # Los dicts conservan el orden de inserción
-    rutas = [f"/asignaturas/{i}" for i, asig in asignaturas.items()
-             if minimo is None or asig["numero_alumnos"] >= minimo]
+    rutas = []
+    for identificador, asignatura in asignaturas.items():
+        if minimo is None or asignatura["numero_alumnos"] >= minimo:
+            rutas.append(f"/asignaturas/{identificador}")
     # El paginado se aplica después del filtro
     if pagina is not None:
         inicio = (pagina - 1) * tam_pagina
@@ -121,14 +147,17 @@ def obtener_asignatura(identificador):
     """Devuelve los datos de una asignatura"""
     if identificador not in asignaturas:
         return '', 404
-    return jsonify({"id": identificador, **asignaturas[identificador]})
+    resultado = asignaturas[identificador].copy()
+    resultado["id"] = identificador
+    return jsonify(resultado)
 
 
 @app.route('/asignaturas/<int:identificador>', methods=['DELETE'])
 def borrar_asignatura(identificador):
     """Borra una asignatura"""
-    if asignaturas.pop(identificador, None) is None:
+    if identificador not in asignaturas:
         return '', 404
+    del asignaturas[identificador]
     return '', 204
 
 
@@ -141,7 +170,9 @@ def reemplazar_asignatura(identificador):
     if not es_asig_valida(datos):
         return '', 400
     asignaturas[identificador] = datos
-    return jsonify({"id": identificador, **datos})
+    resultado = datos.copy()
+    resultado["id"] = identificador
+    return jsonify(resultado)
 
 
 @app.route('/asignaturas/<int:identificador>', methods=['PATCH'])
@@ -153,7 +184,9 @@ def modificar_asignatura(identificador):
     if not es_patch_valido(datos):
         return '', 400
     asignaturas[identificador].update(datos)
-    return jsonify({"id": identificador, **asignaturas[identificador]})
+    resultado = asignaturas[identificador].copy()
+    resultado["id"] = identificador
+    return jsonify(resultado)
 
 
 # --- 2.3 /asignaturas/X/horario ---
