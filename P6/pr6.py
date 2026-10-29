@@ -149,5 +149,22 @@ if __name__  == "__main__":
     u3 = {'name': 'Pepe', 'email': 'pepe@gmail.com', 'gender': 'female', 'status': 'inactive'}
     print(inserta_usuarios([u1, u2], REST_TOKEN))
     print(inserta_usuarios([u3, u2], REST_TOKEN))
+    
     print(get_ident_email('eva@gmail.com', REST_TOKEN))
     print(get_ident_email('barbara@gmail.com', REST_TOKEN))
+    
+
+
+    print(inserta_todo("eva@gmail.com", REST_TOKEN, "Todo 1", "2010-10-30 11:30", "pending"))
+    print(inserta_todo("barbara@gmail.com", REST_TOKEN, "Todo 1", "2034-07-30 11:30", "pending"))
+    print(inserta_todo("eva@gmail.com", REST_TOKEN, "Todo 2", "2020-06-28 16:45", "completed"))
+
+    print(todos_usuario("eva@gmail.com", REST_TOKEN))
+    print(todos_usuario("barbara@gmail.com", REST_TOKEN))
+
+    print(todos_no_cumplidos("eva@gmail.com", REST_TOKEN))
+    print(todos_no_cumplidos("barbara@gmail.com", REST_TOKEN))
+
+
+    print(borra_usuario("eva@gmail.com", REST_TOKEN))
+    print(borra_usuario("eva@gmail.com", REST_TOKEN))
