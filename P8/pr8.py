@@ -1,6 +1,4 @@
 """
-TODO: rellenar
-
 Asignatura: GIW
 Práctica 8
 Grupo: 10
