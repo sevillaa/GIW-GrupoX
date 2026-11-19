@@ -99,14 +99,18 @@ class Linea(EmbeddedDocument):
 
     def clean(self):
         super().clean()
-  
-        if (self.num_items is None or self.precio_item is None or self.total is None or self.producto is None or self.nombre_item is None):
+
+        if (self.num_items is None or
+            self.precio_item is None or
+            self.total is None or
+            self.producto is None or
+            self.nombre_item is None):
             return
 
         numeros = (self.num_items, self.precio_item, self.total)
         if not all(isinstance(n, (int, float)) for n in numeros):
             return
-                    
+
         if self.precio_item <= 0 or self.total <= 0:
             raise ValidationError("Los precios deben ser números reales positivos")
 
@@ -130,11 +134,9 @@ class Pedido(Document):
                         "[0-5][0-9],[0-9]{6}$")#nanoseg
     lineas = EmbeddedDocumentListField(Linea, required = True)
 
-    
-
     def clean(self):
         super().clean()
-                
+
         if (not isinstance(self.total, (int, float)) or
                 not isinstance(self.fecha, str) or self.lineas is None):
             return
@@ -143,7 +145,7 @@ class Pedido(Document):
             raise ValidationError(
                 "El campo lineas debe ser una lista"
             )
-                    
+
         if not self.lineas:
             raise ValidationError("El pedido debe tener al menos una línea")
 
@@ -151,7 +153,7 @@ class Pedido(Document):
             datetime.strptime(self.fecha, "%Y,%m,%d,%H,%M,%S,%f")
         except ValueError as exc:
             raise ValidationError("La fecha del pedido no existe en el calendario") from exc
-                    
+
         suma_lineas = 0
         codigo_productos = set()
 
@@ -200,12 +202,12 @@ class Usuario(Document):
             return
         if not re.fullmatch(r"\d{8}[A-Z]", self.dni):
             raise ValidationError("El DNI debe tener 8 numeros y una letra")
-                    
+
         try:
             datetime.strptime(self.f_nac, "%Y-%m-%d")
         except ValueError as exc:
             raise ValidationError("La fecha de nacimiento no existe en el calendario") from exc
-                    
+
         num_dni = self.dni[:8]
         letra_dni = self.dni[8]
         numero = int(num_dni)
