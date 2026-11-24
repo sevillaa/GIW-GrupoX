@@ -13,6 +13,12 @@ deshonesta ninguna otra actividad que pueda mejorar nuestros resultados ni perju
 resultados de los demás.
 """
 
+import base64
+import io
+from html import escape
+
+import pyotp
+import qrcode
 from flask import Flask, request
 from mongoengine import connect, Document, StringField, EmailField
 from mongoengine.errors import ValidationError
@@ -157,22 +163,130 @@ def login():
 # APARTADO 2 #
 ##############
 
+# Generación de la semilla, de la URL de registro y del código QR:
 #
-# Explicación detallada de cómo se genera la semilla aleatoria, cómo se construye
-# la URL de registro en Google Authenticator y cómo se genera el código QR
+# 1. Semilla aleatoria (secreto TOTP):
+#    Se genera con pyotp.random_base32(), que internamente usa el módulo 'secrets'
+#    de Python (un generador de números aleatorios criptográficamente seguro, CSPRNG)
+#    para elegir 32 caracteres del alfabeto Base32 (A-Z y 2-7). Eso equivale a
+#    160 bits de entropía, el tamaño recomendado por el RFC 4226 para HOTP/TOTP.
+#    El secreto se guarda en el campo 'totp_secret' del usuario para que el
+#    servidor pueda calcular después el código temporal y compararlo con el
+#    que envía el usuario.
 #
+# 2. URL de registro en Google Authenticator:
+#    Se construye con el método provisioning_uri() de pyotp.TOTP, que sigue el
+#    formato "Key Uri Format" que entienden las apps de autenticación:
+#        otpauth://totp/<emisor>:<usuario>?secret=<secreto>&issuer=<emisor>
+#    El emisor (ISSUER) identifica nuestra aplicación y el usuario es su nickname,
+#    de modo que la app muestre la cuenta como "GIW Grupo 10: nickname". Los
+#    parámetros no indicados (algoritmo SHA1, 6 dígitos y periodo de 30 segundos)
+#    toman los valores por defecto que usan todas las apps.
+#
+# 3. Código QR:
+#    Se genera en el propio servidor con la biblioteca qrcode (qrcode.make),
+#    que devuelve una imagen PIL que codifica la URL anterior. Así el secreto no
+#    se envía nunca a un servicio externo. La imagen se guarda en formato PNG en
+#    memoria (io.BytesIO, sin crear ficheros), se codifica en Base64 y se incrusta
+#    directamente en la página HTML con una data URL:
+#        <img src="data:image/png;base64,....">
+#    Además, la página muestra el nickname y el secreto en texto plano por si el
+#    usuario prefiere configurar la app a mano.
+
+# Nombre de nuestra aplicación que verá el usuario en su app de autenticación
+ISSUER = "GIW Grupo 10"
+
+
+def generar_qr_base64(texto: str) -> str:
+    """Genera un código QR con el texto indicado y lo devuelve como PNG en Base64."""
+    imagen_qr = qrcode.make(texto)
+    buffer = io.BytesIO()
+    imagen_qr.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue()).decode("ascii")
 
 
 @app.route('/signup_totp', methods=['POST'])
 def signup_totp():
     """Da de alta a un usuario generando su secreto TOTP y código QR."""
-    ...
+    nickname = request.form.get('nickname', '').strip()
+    full_name = request.form.get('full_name', '').strip()
+    country = request.form.get('country', '').strip()
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '')
+    password2 = request.form.get('password2', '')
+
+    # Mismas comprobaciones que en /signup
+    if password != password2:
+        return render_message("Las contraseñas no coinciden")
+
+    if nickname and User.objects(user_id=nickname).first() is not None:  # pylint: disable=no-member
+        return render_message("El usuario ya existe")
+
+    if not nickname or not password:
+        return render_message("Datos de usuario no válidos")
+
+    # Secreto aleatorio en Base32 que compartimos con la app del usuario
+    secreto = pyotp.random_base32()
+
+    try:
+        new_user = User(
+            user_id=nickname,
+            full_name=full_name,
+            country=country,
+            email=email,
+            passwd=PH.hash(password),
+            totp_secret=secreto
+        )
+        new_user.save(force_insert=True)
+    except ValidationError:
+        return render_message("Datos de usuario no válidos")
+
+    # URL otpauth:// que la app de autenticación sabe interpretar
+    url_registro = pyotp.TOTP(secreto).provisioning_uri(name=nickname, issuer_name=ISSUER)
+    qr_base64 = generar_qr_base64(url_registro)
+
+    # Escapamos los datos que escribe el usuario antes de meterlos en el HTML
+    # para evitar que pueda inyectar código (XSS)
+    return f"""<!DOCTYPE html>
+<html>
+<body>
+<p>Bienvenido usuario {escape(full_name)}</p>
+<p>Escanea este código QR con tu app de autenticación:</p>
+<img src="data:image/png;base64,{qr_base64}" alt="Código QR TOTP">
+<p>Si prefieres configurarla manualmente, usa estos datos:</p>
+<p>Usuario: {escape(nickname)}</p>
+<p>Secreto: {secreto}</p>
+</body>
+</html>"""
 
 
 @app.route('/login_totp', methods=['POST'])
 def login_totp():
     """Autentica a un usuario mediante contraseña y código TOTP."""
-    ...
+    nickname = request.form.get('nickname', '').strip()
+    password = request.form.get('password', '')
+    codigo_totp = request.form.get('totp', '').strip()
+
+    user = User.objects(user_id=nickname).first()  # pylint: disable=no-member
+    if user is None:
+        return render_message("Usuario o contraseña incorrectos")
+
+    try:
+        PH.verify(user.passwd, password)
+    except VerificationError:
+        return render_message("Usuario o contraseña incorrectos")
+
+    # Los usuarios dados de alta con /signup no tienen secreto TOTP
+    if not user.totp_secret:
+        return render_message("Usuario o contraseña incorrectos")
+
+    # verify() calcula el código actual a partir del secreto y lo compara con el
+    # recibido. valid_window=1 acepta también el código del intervalo de 30 s
+    # anterior y posterior, para tolerar pequeños desfases de reloj con el móvil.
+    if not pyotp.TOTP(user.totp_secret).verify(codigo_totp, valid_window=1):
+        return render_message("Usuario o contraseña incorrectos")
+
+    return render_message(f"Bienvenido {user.full_name}")
 
 
 if __name__ == '__main__':
