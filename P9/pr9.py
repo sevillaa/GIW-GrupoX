@@ -14,8 +14,8 @@ resultados de los demás.
 """
 
 import base64
+import html
 import io
-from html import escape
 
 import pyotp
 import qrcode
@@ -197,11 +197,13 @@ def login():
 ISSUER = "GIW Grupo 10"
 
 
-def generar_qr_base64(texto: str) -> str:
+def generate_qr_base64(text: str) -> str:
     """Genera un código QR con el texto indicado y lo devuelve como PNG en Base64."""
-    imagen_qr = qrcode.make(texto)
+    qr_image = qrcode.make(text)
+    # Guardamos la imagen PNG en memoria en lugar de en un fichero
     buffer = io.BytesIO()
-    imagen_qr.save(buffer, format="PNG")
+    qr_image.save(buffer, format="PNG")
+    # b64encode devuelve bytes; decode() los convierte en str para meterlos en el HTML
     return base64.b64encode(buffer.getvalue()).decode("ascii")
 
 
@@ -226,7 +228,7 @@ def signup_totp():
         return render_message("Datos de usuario no válidos")
 
     # Secreto aleatorio en Base32 que compartimos con la app del usuario
-    secreto = pyotp.random_base32()
+    secret = pyotp.random_base32()
 
     try:
         new_user = User(
@@ -235,29 +237,29 @@ def signup_totp():
             country=country,
             email=email,
             passwd=PH.hash(password),
-            totp_secret=secreto
+            totp_secret=secret
         )
         new_user.save(force_insert=True)
     except ValidationError:
         return render_message("Datos de usuario no válidos")
 
     # URL otpauth:// que la app de autenticación sabe interpretar
-    url_registro = pyotp.TOTP(secreto).provisioning_uri(name=nickname, issuer_name=ISSUER)
-    qr_base64 = generar_qr_base64(url_registro)
+    provisioning_url = pyotp.TOTP(secret).provisioning_uri(name=nickname, issuer_name=ISSUER)
+    qr_base64 = generate_qr_base64(provisioning_url)
 
     # Escapamos los datos que escribe el usuario antes de meterlos en el HTML
     # para evitar que pueda inyectar código (XSS)
     return f"""<!DOCTYPE html>
-<html>
-<body>
-<p>Bienvenido usuario {escape(full_name)}</p>
-<p>Escanea este código QR con tu app de autenticación:</p>
-<img src="data:image/png;base64,{qr_base64}" alt="Código QR TOTP">
-<p>Si prefieres configurarla manualmente, usa estos datos:</p>
-<p>Usuario: {escape(nickname)}</p>
-<p>Secreto: {secreto}</p>
-</body>
-</html>"""
+    <html>
+    <body>
+    <p>Bienvenido usuario {html.escape(full_name)}</p>
+    <p>Escanea este código QR con tu app de autenticación:</p>
+    <img src="data:image/png;base64,{qr_base64}" alt="Código QR TOTP">
+    <p>Si prefieres configurarla manualmente, usa estos datos:</p>
+    <p>Usuario: {html.escape(nickname)}</p>
+    <p>Secreto: {secret}</p>
+    </body>
+    </html>"""
 
 
 @app.route('/login_totp', methods=['POST'])
@@ -265,7 +267,7 @@ def login_totp():
     """Autentica a un usuario mediante contraseña y código TOTP."""
     nickname = request.form.get('nickname', '').strip()
     password = request.form.get('password', '')
-    codigo_totp = request.form.get('totp', '').strip()
+    totp_code = request.form.get('totp', '').strip()
 
     user = User.objects(user_id=nickname).first()  # pylint: disable=no-member
     if user is None:
@@ -283,7 +285,7 @@ def login_totp():
     # verify() calcula el código actual a partir del secreto y lo compara con el
     # recibido. valid_window=1 acepta también el código del intervalo de 30 s
     # anterior y posterior, para tolerar pequeños desfases de reloj con el móvil.
-    if not pyotp.TOTP(user.totp_secret).verify(codigo_totp, valid_window=1):
+    if not pyotp.TOTP(user.totp_secret).verify(totp_code, valid_window=1):
         return render_message("Usuario o contraseña incorrectos")
 
     return render_message(f"Bienvenido {user.full_name}")
