@@ -89,7 +89,7 @@ def signup():
     if password != password2:
         return render_message("Las contraseñas no coinciden")
 
-    if nickname and User.objects(user_id=nickname).first() is not None:  # pylint: disable=no-member
+    if nickname and User.objects(user_id=nickname).first() is not None:
         return render_message("El usuario ya existe")
 
     if not nickname or not password:
@@ -118,7 +118,7 @@ def change_password():
     old_password = request.form.get('old_password', '')
     new_password = request.form.get('new_password', '')
 
-    user = User.objects(user_id=nickname).first()  # pylint: disable=no-member
+    user = User.objects(user_id=nickname).first()
     if user is None:
         return render_message("Usuario o contraseña incorrectos")
 
@@ -139,7 +139,7 @@ def login():
     nickname = request.form.get('nickname', '').strip()
     password = request.form.get('password', '')
 
-    user = User.objects(user_id=nickname).first()  # pylint: disable=no-member
+    user = User.objects(user_id=nickname).first()
     if user is None:
         return render_message("Usuario o contraseña incorrectos")
 
@@ -213,7 +213,7 @@ def signup_totp():
     if password != password2:
         return render_message("Las contraseñas no coinciden")
 
-    if nickname and User.objects(user_id=nickname).first() is not None:  # pylint: disable=no-member
+    if nickname and User.objects(user_id=nickname).first() is not None:
         return render_message("El usuario ya existe")
 
     if not nickname or not password:
@@ -261,7 +261,7 @@ def login_totp():
     password = request.form.get('password', '')
     totp_code = request.form.get('totp', '').strip()
 
-    user = User.objects(user_id=nickname).first()  # pylint: disable=no-member
+    user = User.objects(user_id=nickname).first()
     if user is None:
         return render_message("Usuario o contraseña incorrectos")
 
