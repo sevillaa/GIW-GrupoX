@@ -59,10 +59,10 @@ def render_message(message: str) -> str:
 # Mecanismo de almacenamiento de contraseñas y justificación de seguridad:
 #
 # 1. Elección de la biblioteca (argon2-cffi):
-#    Esta biblioteca envuelve la implementación oficial de referencia en C de 
-#    Argon2 (ganador de la Password Hashing Competition), cuenta con mantenimiento
-#    activo, una API muy sencilla y gestiona automaticamente la sal para cada 
-#    contraseña almacenada.
+#    Esta biblioteca envuelve la implementación oficial de referencia en
+#    C de Argon2 (ganador de la Password Hashing Competition), cuenta con
+#    mantenimiento activo, una API muy sencilla y gestiona automaticamente
+#    la sal para cada contraseña almacenada.
 #
 # 2. Por qué es seguro (Argon2):
 #    - Función hash unidireccional: las contraseñas nunca se guardan en texto claro
