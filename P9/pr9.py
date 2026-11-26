@@ -52,6 +52,13 @@ def render_message(message: str) -> str:
     return f"<!DOCTYPE html><html><body><p>{message}</p></body></html>"
 
 
+def get_user(nickname: str):
+    """Devuelve el usuario con ese nickname o None si no existe."""
+    # mongoengine añade 'objects' a la clase en tiempo de ejecución mediante una
+    # metaclase, por eso pylint no lo detecta (falso positivo de no-member)
+    return User.objects(user_id=nickname).first()  # pylint: disable=no-member
+
+
 ##############
 # APARTADO 1 #
 ##############
@@ -89,7 +96,7 @@ def signup():
     if password != password2:
         return render_message("Las contraseñas no coinciden")
 
-    if nickname and User.objects(user_id=nickname).first() is not None:
+    if nickname and get_user(nickname) is not None:
         return render_message("El usuario ya existe")
 
     if not nickname or not password:
@@ -118,7 +125,7 @@ def change_password():
     old_password = request.form.get('old_password', '')
     new_password = request.form.get('new_password', '')
 
-    user = User.objects(user_id=nickname).first()
+    user = get_user(nickname)
     if user is None:
         return render_message("Usuario o contraseña incorrectos")
 
@@ -139,7 +146,7 @@ def login():
     nickname = request.form.get('nickname', '').strip()
     password = request.form.get('password', '')
 
-    user = User.objects(user_id=nickname).first()
+    user = get_user(nickname)
     if user is None:
         return render_message("Usuario o contraseña incorrectos")
 
@@ -213,7 +220,7 @@ def signup_totp():
     if password != password2:
         return render_message("Las contraseñas no coinciden")
 
-    if nickname and User.objects(user_id=nickname).first() is not None:
+    if nickname and get_user(nickname) is not None:
         return render_message("El usuario ya existe")
 
     if not nickname or not password:
@@ -261,7 +268,7 @@ def login_totp():
     password = request.form.get('password', '')
     totp_code = request.form.get('totp', '').strip()
 
-    user = User.objects(user_id=nickname).first()
+    user = get_user(nickname)
     if user is None:
         return render_message("Usuario o contraseña incorrectos")
 
