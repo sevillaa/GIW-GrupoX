@@ -59,28 +59,20 @@ def render_message(message: str) -> str:
 # Mecanismo de almacenamiento de contraseñas y justificación de seguridad:
 #
 # 1. Elección de la biblioteca (argon2-cffi):
-#    Frente a alternativas como hashlib (funciones hash generales demasiado rápidas
-#    y sin gestión automática de sal), bcrypt (limitado a contraseñas de 72 bytes y
-#    no resistente a ataques con hardware especializado con gran memoria) o passlib
-#    (con menor actividad reciente), se ha elegido 'argon2-cffi'. Esta biblioteca
-#    envuelve la implementación oficial de referencia en C de Argon2 (ganador de la
-#    Password Hashing Competition), cuenta con mantenimiento activo, una API muy
-#    sencilla y almacena en una única cadena autocontenida (formato PHC) el algoritmo,
-#    versión, parámetros de coste, sal y resumen criptográfico.
+#    Esta biblioteca envuelve la implementación oficial de referencia en C de 
+#    Argon2 (ganador de la Password Hashing Competition), cuenta con mantenimiento
+#    activo, una API muy sencilla y gestiona automaticamente la sal para cada 
+#    contraseña almacenada.
 #
-# 2. Por qué es seguro (Argon2id):
+# 2. Por qué es seguro (Argon2):
 #    - Función hash unidireccional: las contraseñas nunca se guardan en texto claro
 #      ni cifradas de forma reversible; ante una fuga de la base de datos no es
 #      posible recuperar la clave original.
 #    - Sal criptográfica única por usuario: argon2-cffi genera automáticamente una
-#      sal aleatoria de 128 bits (mediante un CSPRNG) para cada contraseña. Esto
+#      sal aleatoria de 128 bits para cada contraseña. Esto
 #      inutiliza ataques mediante tablas arcoíris y garantiza que dos usuarios con
 #      la misma contraseña produzcan hashes completamente distintos.
-#    - Resistencia a fuerza bruta y hardware paralelo (memory-hard): Argon2id combina
-#      Argon2i (acceso a memoria independiente de los datos, mitigando ataques de
-#      canal lateral) y Argon2d (acceso dependiente de los datos, maximizando la
-#      resistencia frente a GPUs y ASICs). Sus parámetros por defecto exigen un alto
-#      coste de memoria (64 MiB), iteraciones (t=3) y paralelismo (p=4), haciendo
+#    - Exige un alto coste de memoria, iteraciones y paralelismo, haciendo
 #      inviable el descifrado masivo por fuerza bruta.
 
 
